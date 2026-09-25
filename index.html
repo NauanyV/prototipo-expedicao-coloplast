@@ -1,1150 +1,983 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Novo documento - Coloplast | Protótipo</title>
+  <title>Novo documento - Coloplast | Protótipo</title>
 
-<style>
-:root {
-  --bg:#f5f7fb;
-  --card:#ffffff;
-  --text:#1f2937;
-  --muted:#6b7280;
-  --border:#d9dee8;
-  --accent:#2457d6;
-  --accent2:#1744b0;
-  --success:#15803d;
-  --warning:#b45309;
-  --danger:#b91c1c;
-}
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d9dee8;
+      --accent: #2457d6;
+      --accent2: #1744b0;
+      --success: #15803d;
+      --warning: #b45309;
+      --danger: #b91c1c;
+    }
 
-* {
-  box-sizing:border-box;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin:0;
-  font-family:Segoe UI, Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-.wrap {
-  max-width:1100px;
-  margin:28px auto;
-  padding:0 18px;
-}
+    .wrap {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 18px;
+    }
 
-.top {
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:18px;
-}
+    .top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
 
-h1 {
-  font-size:24px;
-  margin:0 0 4px;
-}
+    h1 {
+      font-size: 24px;
+      margin: 0 0 4px;
+    }
 
-.sub {
-  color:var(--muted);
-  margin:0;
-}
+    .sub {
+      color: var(--muted);
+      margin: 0;
+    }
 
-.badge {
-  padding:7px 10px;
-  border-radius:999px;
-  background:#e9efff;
-  color:#1d4ed8;
-  font-size:12px;
-  font-weight:700;
-}
+    .badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #e9efff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-.grid {
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:18px;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+    }
 
-.card {
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:20px;
-  box-shadow:0 2px 12px rgba(31,41,55,.04);
-}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(31, 41, 55, .04);
+    }
 
-.card h2 {
-  font-size:16px;
-  margin:0 0 16px;
-}
+    .card h2 {
+      font-size: 16px;
+      margin: 0 0 16px;
+    }
 
-label {
-  display:block;
-  font-size:13px;
-  font-weight:700;
-  margin:0 0 7px;
-}
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0 0 7px;
+    }
 
-input,
-select,
-textarea {
-  width:100%;
-  padding:11px 12px;
-  border:1px solid var(--border);
-  border-radius:9px;
-  font:inherit;
-  background:#fff;
-  outline:none;
-}
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font: inherit;
+      background: #ffffff;
+      outline: none;
+    }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(36,87,214,.1);
-}
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(36, 87, 214, .1);
+    }
 
-.field {
-  margin-bottom:15px;
-}
+    .field {
+      margin-bottom: 15px;
+    }
 
-.req {
-  color:var(--danger);
-}
+    .req {
+      color: var(--danger);
+    }
 
-.hint {
-  font-size:12px;
-  color:var(--muted);
-  margin-top:6px;
-}
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
 
-.drop {
-  border:1.5px dashed #aab3c2;
-  border-radius:10px;
-  padding:18px;
-  text-align:center;
-  background:#fafbfe;
-}
+    .drop {
+      border: 1.5px dashed #aab3c2;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      background: #fafbfe;
+    }
 
-.drop input {
-  border:0;
-  padding:0;
-  background:transparent;
-}
+    .drop input {
+      border: 0;
+      padding: 0;
+      background: transparent;
+    }
 
-.file {
-  margin-top:10px;
-  font-size:13px;
-  color:var(--muted);
-  word-break:break-word;
-}
+    .file {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      word-break: break-word;
+    }
 
-.btns {
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
 
-button {
-  border:0;
-  border-radius:9px;
-  padding:11px 15px;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 15px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-.primary {
-  background:var(--accent);
-  color:white;
-}
+    button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
 
-.primary:hover {
-  background:var(--accent2);
-}
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
 
-.secondary {
-  background:#edf1f7;
-  color:#263244;
-}
+    .primary:hover {
+      background: var(--accent2);
+    }
 
-.danger {
-  background:#fcecec;
-  color:var(--danger);
-}
+    .secondary {
+      background: #edf1f7;
+      color: #263244;
+    }
 
-.status {
-  margin-top:16px;
-  padding:12px 14px;
-  border-radius:10px;
-  background:#f6f7f9;
-  font-size:13px;
-  white-space:pre-wrap;
-  min-height:44px;
-}
+    .danger {
+      background: #fcecec;
+      color: var(--danger);
+    }
 
-.kpis {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
+    .status {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f6f7f9;
+      font-size: 13px;
+      white-space: pre-wrap;
+      min-height: 44px;
+    }
 
-.kpi {
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:13px;
-}
+    .status-neutral {
+      background: #f6f7f9;
+      color: var(--text);
+    }
 
-.kpi b {
-  display:block;
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:4px;
-}
+    .status-success {
+      background: #eaf8ef;
+      color: var(--success);
+    }
 
-.kpi span {
-  font-size:18px;
-  font-weight:800;
-}
+    .status-error {
+      background: #fcecec;
+      color: var(--danger);
+    }
 
-.table {
-  width:100%;
-  border-collapse:collapse;
-  font-size:12px;
-  margin-top:12px;
-}
+    .kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
-.table th,
-.table td {
-  border-bottom:1px solid #edf0f4;
-  text-align:left;
-  padding:9px 6px;
-}
+    .kpi {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px;
+    }
 
-.pill {
-  display:inline-block;
-  padding:4px 7px;
-  border-radius:999px;
-  font-weight:700;
-  font-size:11px;
-}
+    .kpi b {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
 
-.pill-open {
-  background:#fff4d9;
-  color:var(--warning);
-}
+    .kpi span {
+      font-size: 18px;
+      font-weight: 800;
+    }
 
-.pill-done {
-  background:#e9f8ee;
-  color:var(--success);
-}
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 12px;
+    }
 
-.api {
-  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
-  font-size:12px;
-  line-height:1.6;
-}
+    .table th,
+    .table td {
+      border-bottom: 1px solid #edf0f4;
+      text-align: left;
+      padding: 9px 6px;
+    }
 
-@media(max-width:850px) {
-  .grid {
-    grid-template-columns:1fr;
-  }
-}
-</style>
+    .pill {
+      display: inline-block;
+      padding: 4px 7px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 11px;
+    }
 
+    .pill-open {
+      background: #fff4d9;
+      color: var(--warning);
+    }
+
+    .pill-done {
+      background: #e9f8ee;
+      color: var(--success);
+    }
+
+    .api {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 850px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="wrap">
+  <div class="wrap">
 
-  <div class="top">
+    <div class="top">
 
-    <div>
-      <h1>Novo documento</h1>
-      <p class="sub">
-        Protótipo básico para simular a entrada de documentos da expedição.
-      </p>
-    </div>
+      <div>
+        <h1>Novo documento</h1>
 
-    <div class="badge">
-      MOCK API • DEMONSTRAÇÃO
-    </div>
-
-  </div>
-
-  <div class="grid">
-
-    <section class="card">
-
-      <h2>
-        Preencha os dados e anexe os arquivos para inserir novos documentos.
-      </h2>
-
-      <div class="field">
-
-        <label for="cliente">
-          Selecionar cliente <span class="req">*</span>
-        </label>
-
-        <select id="cliente">
-
-          <option value="">
-            Selecionar cliente
-          </option>
-
-          <option value="Coloplast">
-            Coloplast
-          </option>
-
-          <option value="Voge">
-            Voge
-          </option>
-
-          <option value="Outro">
-            Outro
-          </option>
-
-        </select>
-
+        <p class="sub">
+          Protótipo básico para simular a entrada de documentos da expedição.
+        </p>
       </div>
 
-      <div class="field">
-
-        <label for="nf">
-          Número da nota <span class="req">*</span>
-        </label>
-
-        <input
-          id="nf"
-          type="text"
-          placeholder="Ex.: 21007"
-        >
-
+      <div class="badge">
+        MOCK API • DEMONSTRAÇÃO
       </div>
 
-      <div class="field">
+    </div>
 
-        <label for="carga">
-          Número do ID de carga <span class="req">*</span>
-        </label>
+    <div class="grid">
 
-        <input
-          id="carga"
-          type="text"
-          placeholder="Ex.: 141501"
-        >
+      <section class="card">
 
-        <div class="hint">
-          O ID da carga é o identificador usado para localizar a carga na simulação.
+        <h2>
+          Preencha os dados e anexe os arquivos para inserir novos documentos.
+        </h2>
+
+        <div class="field">
+
+          <label for="cliente">
+            Selecionar cliente <span class="req">*</span>
+          </label>
+
+          <select id="cliente">
+            <option value="">Selecionar cliente</option>
+            <option value="Coloplast">Coloplast</option>
+            <option value="Voge">Voge</option>
+            <option value="Outro">Outro</option>
+          </select>
+
         </div>
 
-      </div>
+        <div class="field">
 
-      <div class="field">
-
-        <label>
-          Documentos <span class="req">*</span>
-        </label>
-
-        <div class="drop">
+          <label for="nf">
+            Número da nota <span class="req">*</span>
+          </label>
 
           <input
-            id="arquivo"
-            type="file"
-            accept=".pdf,.xml,.png,.jpg,.jpeg"
+            id="nf"
+            type="text"
+            placeholder="Ex.: 21007"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label for="carga">
+            Número do ID de carga <span class="req">*</span>
+          </label>
+
+          <input
+            id="carga"
+            type="text"
+            placeholder="Ex.: 141501"
           >
 
           <div class="hint">
-            Aceita PDF, XML, PNG ou JPG com até 20 MB.
-          </div>
-
-          <div
-            class="file"
-            id="arquivoInfo"
-          >
-            Nenhum arquivo selecionado
+            O ID da carga é o identificador usado para localizar a carga na simulação.
           </div>
 
         </div>
 
-      </div>
+        <div class="field">
 
-      <div class="btns">
+          <label for="arquivo">
+            Documentos <span class="req">*</span>
+          </label>
 
-        <button
-          class="primary"
-          id="enviar"
-        >
-          Enviar documento
-        </button>
+          <div class="drop">
 
-        <button
-          class="secondary"
-          id="buscar"
-        >
-          Consultar carga
-        </button>
+            <input
+              id="arquivo"
+              type="file"
+              accept=".pdf,.xml,.png,.jpg,.jpeg"
+            >
 
-        <button
-          class="danger"
-          id="limpar"
-        >
-          Limpar
-        </button>
+            <div class="hint">
+              Aceita PDF, XML, PNG ou JPG com até 20 MB.
+            </div>
 
-      </div>
+            <div class="file" id="arquivoInfo">
+              Nenhum arquivo selecionado
+            </div>
 
-      <div
-        class="status"
-        id="status"
-      >
-        Carregando integração...
-      </div>
+          </div>
 
-    </section>
-
-    <aside class="card">
-
-      <h2>
-        Simulação do Analytics
-      </h2>
-
-      <div class="kpis">
-
-        <div class="kpi">
-          <b>Endpoint</b>
-          <span class="api">/api</span>
         </div>
 
-        <div class="kpi">
-          <b>Autenticação</b>
-          <span class="api">x-api-key</span>
+        <div class="btns">
+
+          <button class="primary" id="enviar" type="button">
+            Enviar documento
+          </button>
+
+          <button class="secondary" id="buscar" type="button">
+            Consultar carga
+          </button>
+
+          <button class="danger" id="limpar" type="button">
+            Limpar
+          </button>
+
         </div>
 
-      </div>
+        <div class="status status-neutral" id="status">
+          Inicializando integração...
+        </div>
 
-      <table class="table">
+      </section>
 
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>NF</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+      <aside class="card">
 
-        <tbody id="cargas">
+        <h2>
+          Simulação do Analytics
+        </h2>
 
-          <tr>
-            <td colspan="4">
-              Carregando cargas...
-            </td>
-          </tr>
+        <div class="kpis">
 
-        </tbody>
+          <div class="kpi">
+            <b>Endpoint</b>
+            <span class="api">/api</span>
+          </div>
 
-      </table>
+          <div class="kpi">
+            <b>Autenticação</b>
+            <span class="api">x-api-key</span>
+          </div>
 
-      <p class="hint" style="margin-top:14px">
+        </div>
 
-        A API mock simula uma base do Analytics.
-        Ao receber um documento, a API valida cliente + NF + ID,
-        registra o documento e altera o status da carga para
-        <b>EXPEDIDA</b>.
+        <table class="table">
 
-      </p>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>NF</th>
+              <th>Status</th>
+            </tr>
+          </thead>
 
-    </aside>
+          <tbody id="cargas">
+
+            <tr>
+              <td colspan="4">
+                Carregando cargas...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+        <p class="hint" style="margin-top:14px">
+          A API mock simula uma base do Analytics. Ao receber um documento,
+          a API valida cliente + NF + ID, registra o documento e altera o
+          status da carga para <b>EXPEDIDA</b>.
+        </p>
+
+      </aside>
+
+    </div>
 
   </div>
 
-</div>
+  <script>
+    /*
+      ============================================================
+      PREENCHA SOMENTE A LINHA ABAIXO
+
+      Use exatamente a mesma chave configurada:
+      1. No Vercel como API_KEY
+      2. No Power Automate no cabeçalho x-api-key
+
+      Mantenha a chave entre aspas.
+      ============================================================
+    */
+
+    let API_KEY = "vd_140926";
 
 
-<script>
+    /*
+      ============================================================
+      NÃO ALTERE O CÓDIGO ABAIXO
+      ============================================================
+    */
 
-/* =========================================================
-   CONFIGURAÇÃO
-   ========================================================= */
-
-const API_KEY = "vd_140926";
-
-
-const statusEl =
-  document.getElementById("status");
-
-const cargasEl =
-  document.getElementById("cargas");
-
-const arquivo =
-  document.getElementById("arquivo");
+    let statusEl = document.getElementById("status");
+    let cargasEl = document.getElementById("cargas");
+    let arquivoEl = document.getElementById("arquivo");
+    let enviarBtn = document.getElementById("enviar");
+    let buscarBtn = document.getElementById("buscar");
+    let limparBtn = document.getElementById("limpar");
 
 
-/* =========================================================
-   ARQUIVO
-   ========================================================= */
-
-arquivo.addEventListener(
-  "change",
-  () => {
-
-    const f =
-      arquivo.files[0];
-
-    document
-      .getElementById("arquivoInfo")
-      .textContent =
-        f
-          ? `${f.name} - ${(f.size / 1024 / 1024).toFixed(2)} MB`
-          : "Nenhum arquivo selecionado";
-
-  }
-);
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-function setStatus(
-  mensagem,
-  sucesso = false
-) {
-
-  statusEl.textContent =
-    mensagem;
-
-  statusEl.style.background =
-    sucesso
-      ? "#eaf8ef"
-      : "#fcecec";
-
-  statusEl.style.color =
-    sucesso
-      ? "#15803d"
-      : "#b91c1c";
-
-}
-
-
-/* =========================================================
-   FUNÇÃO CENTRAL DE ACESSO À API
-   ========================================================= */
-
-async function apiRequest(
-  url,
-  options = {}
-) {
-
-  const headers = {
-    ...(options.headers || {}),
-    "x-api-key": API_KEY 
-  };
-
-
-  let resposta;
-
-
-  try {
-
-    resposta =
-      await fetch(
-        url,
-        {
-          ...options,
-          headers
-        }
-      );
-
-  }
-  catch (erro) {
-
-    throw new Error(
-      "Não foi possível conectar à API."
-    );
-
-  }
-
-
-  const texto =
-    await resposta.text();
-
-
-  let dados = {};
-
-
-  if (texto) {
-
-    try {
-
-      dados =
-        JSON.parse(texto);
-
-    }
-    catch {
-
-      throw new Error(
-        `HTTP ${resposta.status}: resposta inválida da API.`
-      );
-
-    }
-
-  }
-
-
-  if (!resposta.ok) {
-
-    throw new Error(
-      `HTTP ${resposta.status}: ${
-        dados.erro ||
-        "Erro retornado pela API"
-      }`
-    );
-
-  }
-
-
-  return dados;
-
-}
-
-
-/* =========================================================
-   CARREGAR CARGAS
-   ========================================================= */
-
-async function carregarCargas() {
-
-  cargasEl.innerHTML = `
-    <tr>
-      <td colspan="4">
-        Carregando cargas...
-      </td>
-    </tr>
-  `;
-
-
-  try {
-
-    const dados =
-      await apiRequest(
-        "/api/cargas"
-      );
-
-
-    if (
-      !Array.isArray(
-        dados.cargas
-      )
-    ) {
-
-      throw new Error(
-        "A API não retornou uma lista válida de cargas."
-      );
-
+    function escaparHTML(valor) {
+      let elemento = document.createElement("div");
+      elemento.textContent = String(valor == null ? "" : valor);
+      return elemento.innerHTML;
     }
 
 
-    if (
-      dados.cargas.length === 0
-    ) {
+    function mostrarStatus(mensagem, tipo) {
+      statusEl.textContent = mensagem;
 
-      cargasEl.innerHTML = `
-        <tr>
-          <td colspan="4">
-            Nenhuma carga encontrada.
-          </td>
-        </tr>
-      `;
-
-
-      setStatus(
-        "API conectada, porém nenhuma carga foi encontrada.",
-        true
+      statusEl.classList.remove(
+        "status-neutral",
+        "status-success",
+        "status-error"
       );
 
-
-      return;
-
-    }
-
-
-    cargasEl.innerHTML =
-      dados.cargas
-        .map(
-          carga => {
-
-            const id =
-              carga.id_carga ||
-              carga.id ||
-              "";
-
-            const cliente =
-              carga.cliente ||
-              "";
-
-            const nf =
-              carga.nf ||
-              "";
-
-            const status =
-              carga.status ||
-              "";
-
-
-            return `
-
-              <tr>
-
-                <td>
-                  ${id}
-                </td>
-
-                <td>
-                  ${cliente}
-                </td>
-
-                <td>
-                  ${nf}
-                </td>
-
-                <td>
-
-                  <span class="
-                    pill ${
-                      status === "EXPEDIDA"
-                        ? "pill-done"
-                        : "pill-open"
-                    }
-                  ">
-
-                    ${status}
-
-                  </span>
-
-                </td>
-
-              </tr>
-
-            `;
-
-          }
-        )
-        .join("");
-
-
-    setStatus(
-      `API conectada com sucesso. ${dados.cargas.length} carga(s) carregada(s).`,
-      true
-    );
-
-  }
-  catch (erro) {
-
-    cargasEl.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="4"
-          style="
-            color:#b91c1c;
-            font-weight:700;
-          "
-        >
-          Erro ao carregar cargas
-        </td>
-
-      </tr>
-
-    `;
-
-
-    setStatus(
-      `ERRO DE INTEGRAÇÃO
-
-${erro.message}`
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   CONSULTAR CARGA
-   ========================================================= */
-
-document
-  .getElementById("buscar")
-  .onclick =
-async () => {
-
-
-  const id =
-    document
-      .getElementById("carga")
-      .value
-      .trim();
-
-
-  if (!id) {
-
-    setStatus(
-      "Informe o ID da carga."
-    );
-
-    return;
-
-  }
-
-
-  setStatus(
-    `Consultando carga ${id}...`
-  );
-
-
-  try {
-
-    const dados =
-      await apiRequest(
-        `/api/cargas/${encodeURIComponent(id)}`
-      );
-
-
-    setStatus(
-`CARGA LOCALIZADA
-
-ID: ${dados.id_carga || dados.id || ""}
-Cliente: ${dados.cliente || ""}
-NF: ${dados.nf || ""}
-Status: ${dados.status || ""}`,
-      true
-    );
-
-  }
-  catch (erro) {
-
-    setStatus(
-`ERRO AO CONSULTAR CARGA
-
-${erro.message}`
-    );
-
-  }
-
-};
-
-
-/* =========================================================
-   ENVIAR DOCUMENTO
-   ========================================================= */
-
-document
-  .getElementById("enviar")
-  .onclick =
-async () => {
-
-
-  const cliente =
-    document
-      .getElementById("cliente")
-      .value;
-
-
-  const nf =
-    document
-      .getElementById("nf")
-      .value
-      .trim();
-
-
-  const idCarga =
-    document
-      .getElementById("carga")
-      .value
-      .trim();
-
-
-  const file =
-    arquivo.files[0];
-
-
-  if (
-    !cliente ||
-    !nf ||
-    !idCarga ||
-    !file
-  ) {
-
-    setStatus(
-      "Preencha cliente, NF, ID da carga e anexe um documento."
-    );
-
-    return;
-
-  }
-
-
-  if (
-    file.size >
-    20 * 1024 * 1024
-  ) {
-
-    setStatus(
-      "Arquivo acima do limite de 20 MB."
-    );
-
-    return;
-
-  }
-
-
-  const extensao =
-    file.name
-      .split(".")
-      .pop()
-      .toLowerCase();
-
-
-  const extensoesPermitidas = [
-    "pdf",
-    "xml",
-    "png",
-    "jpg",
-    "jpeg"
-  ];
-
-
-  if (
-    !extensoesPermitidas
-      .includes(extensao)
-  ) {
-
-    setStatus(
-      "Formato de arquivo não permitido."
-    );
-
-    return;
-
-  }
-
-
-  setStatus(
-    "Preparando documento..."
-  );
-
-
-  try {
-
-
-    const base64 =
-      await new Promise(
-        (
-          resolve,
-          reject
-        ) => {
-
-          const leitor =
-            new FileReader();
-
-
-          leitor.onload =
-            () => {
-
-              const resultado =
-                String(
-                  leitor.result
-                );
-
-
-              resolve(
-                resultado
-                  .split(",")[1]
-              );
-
-            };
-
-
-          leitor.onerror =
-            () => {
-
-              reject(
-                new Error(
-                  "Erro ao ler o arquivo."
-                )
-              );
-
-            };
-
-
-          leitor.readAsDataURL(
-            file
-          );
-
-        }
-      );
-
-
-    const payload = {
-
-      cliente:
-        cliente,
-
-      nf:
-        nf,
-
-      id_carga:
-        idCarga,
-
-      documento: {
-
-        nome:
-          file.name,
-
-        tipo:
-          file.type ||
-          extensao,
-
-        tamanho:
-          file.size,
-
-        conteudo_base64:
-          base64
-
+      if (tipo === "sucesso") {
+        statusEl.classList.add("status-success");
+        return;
       }
 
+      if (tipo === "erro") {
+        statusEl.classList.add("status-error");
+        return;
+      }
+
+      statusEl.classList.add("status-neutral");
+    }
+
+
+    function definirProcessamento(processando) {
+      enviarBtn.disabled = processando;
+      buscarBtn.disabled = processando;
+      limparBtn.disabled = processando;
+    }
+
+
+    async function chamarAPI(url, opcoes) {
+      let configuracao = opcoes || {};
+      let cabecalhos = {};
+
+      if (configuracao.headers) {
+        let nomesCabecalhos = Object.keys(configuracao.headers);
+
+        for (let i = 0; i < nomesCabecalhos.length; i++) {
+          let nome = nomesCabecalhos[i];
+          cabecalhos[nome] = configuracao.headers[nome];
+        }
+      }
+
+      cabecalhos["x-api-key"] = API_KEY;
+
+      configuracao.headers = cabecalhos;
+      configuracao.cache = "no-store";
+
+      let resposta;
+
+      try {
+        resposta = await fetch(url, configuracao);
+      } catch (erroConexao) {
+        throw new Error(
+          "Não foi possível conectar à API. " +
+          erroConexao.message
+        );
+      }
+
+      let texto = await resposta.text();
+      let dados = {};
+
+      if (texto) {
+        try {
+          dados = JSON.parse(texto);
+        } catch (erroJSON) {
+          throw new Error(
+            "HTTP " +
+            resposta.status +
+            ": a API retornou uma resposta que não é JSON."
+          );
+        }
+      }
+
+      if (!resposta.ok) {
+        throw new Error(
+          "HTTP " +
+          resposta.status +
+          ": " +
+          (dados.erro || "erro retornado pela API.")
+        );
+      }
+
+      return dados;
+    }
+
+
+    async function carregarCargas() {
+      cargasEl.innerHTML =
+        '<tr><td colspan="4">Carregando cargas...</td></tr>';
+
+      mostrarStatus(
+        "Conectando com a API...",
+        "neutro"
+      );
+
+      try {
+        let dados = await chamarAPI(
+          "/api/cargas?v=" + Date.now(),
+          {
+            method: "GET"
+          }
+        );
+
+        let cargas = dados.cargas;
+
+        if (!Array.isArray(cargas)) {
+          throw new Error(
+            "A API não retornou uma lista válida de cargas."
+          );
+        }
+
+        if (cargas.length === 0) {
+          cargasEl.innerHTML =
+            '<tr><td colspan="4">Nenhuma carga encontrada.</td></tr>';
+
+          mostrarStatus(
+            "API conectada, mas nenhuma carga foi encontrada.",
+            "sucesso"
+          );
+
+          return;
+        }
+
+        let linhas = "";
+
+        for (let i = 0; i < cargas.length; i++) {
+          let item = cargas[i];
+
+          let id = item.id_carga || item.id || "";
+          let cliente = item.cliente || "";
+          let nf = item.nf || "";
+          let status = item.status || "";
+
+          let classe =
+            status === "EXPEDIDA"
+              ? "pill-done"
+              : "pill-open";
+
+          linhas +=
+            "<tr>" +
+              "<td>" + escaparHTML(id) + "</td>" +
+              "<td>" + escaparHTML(cliente) + "</td>" +
+              "<td>" + escaparHTML(nf) + "</td>" +
+              "<td>" +
+                '<span class="pill ' + classe + '">' +
+                  escaparHTML(status) +
+                "</span>" +
+              "</td>" +
+            "</tr>";
+        }
+
+        cargasEl.innerHTML = linhas;
+
+        mostrarStatus(
+          "API conectada com sucesso. " +
+          cargas.length +
+          " carga(s) carregada(s).",
+          "sucesso"
+        );
+
+      } catch (erro) {
+        cargasEl.innerHTML =
+          '<tr>' +
+            '<td colspan="4" style="color:#b91c1c;font-weight:700;">' +
+              "Erro ao carregar cargas" +
+            "</td>" +
+          "</tr>";
+
+        mostrarStatus(
+          "ERRO DE INTEGRAÇÃO\n\n" +
+          erro.message,
+          "erro"
+        );
+      }
+    }
+
+
+    buscarBtn.onclick = async function () {
+      let id =
+        document
+          .getElementById("carga")
+          .value
+          .trim();
+
+      if (!id) {
+        mostrarStatus(
+          "Informe o ID da carga.",
+          "erro"
+        );
+
+        return;
+      }
+
+      definirProcessamento(true);
+
+      mostrarStatus(
+        "Consultando carga " + id + "...",
+        "neutro"
+      );
+
+      try {
+        let dados = await chamarAPI(
+          "/api/cargas/" +
+          encodeURIComponent(id) +
+          "?v=" +
+          Date.now(),
+          {
+            method: "GET"
+          }
+        );
+
+        let idRetorno =
+          dados.id_carga ||
+          dados.id ||
+          "";
+
+        mostrarStatus(
+          "CARGA LOCALIZADA\n\n" +
+          "ID: " + idRetorno + "\n" +
+          "Cliente: " + (dados.cliente || "") + "\n" +
+          "NF: " + (dados.nf || "") + "\n" +
+          "Status: " + (dados.status || ""),
+          "sucesso"
+        );
+
+      } catch (erro) {
+        mostrarStatus(
+          "ERRO AO CONSULTAR CARGA\n\n" +
+          erro.message,
+          "erro"
+        );
+      } finally {
+        definirProcessamento(false);
+      }
     };
 
 
-    setStatus(
-      "Enviando documento para a API..."
+    arquivoEl.addEventListener(
+      "change",
+      function () {
+        let arquivo = arquivoEl.files[0];
+        let infoArquivo =
+          document.getElementById("arquivoInfo");
+
+        if (!arquivo) {
+          infoArquivo.textContent =
+            "Nenhum arquivo selecionado";
+
+          return;
+        }
+
+        let tamanhoMB =
+          (
+            arquivo.size /
+            1024 /
+            1024
+          ).toFixed(2);
+
+        infoArquivo.textContent =
+          arquivo.name +
+          " - " +
+          tamanhoMB +
+          " MB";
+      }
     );
 
 
-    const dados =
-      await apiRequest(
-        "/api/documentos",
-        {
+    function converterArquivoParaBase64(arquivo) {
+      return new Promise(
+        function (resolve, reject) {
+          let leitor = new FileReader();
 
-          method:
-            "POST",
+          leitor.onload = function () {
+            let resultado = String(leitor.result);
+            let partes = resultado.split(",");
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+            if (partes.length < 2) {
+              reject(
+                new Error(
+                  "Não foi possível converter o arquivo."
+                )
+              );
 
-          body:
-            JSON.stringify(
-              payload
-            )
+              return;
+            }
 
+            resolve(partes[1]);
+          };
+
+          leitor.onerror = function () {
+            reject(
+              new Error(
+                "Não foi possível ler o arquivo."
+              )
+            );
+          };
+
+          leitor.readAsDataURL(arquivo);
         }
       );
+    }
 
 
-    const carga =
-      dados.carga ||
-      {};
+    enviarBtn.onclick = async function () {
+      let cliente =
+        document
+          .getElementById("cliente")
+          .value;
+
+      let nf =
+        document
+          .getElementById("nf")
+          .value
+          .trim();
+
+      let idCarga =
+        document
+          .getElementById("carga")
+          .value
+          .trim();
+
+      let arquivo = arquivoEl.files[0];
+
+      if (
+        !cliente ||
+        !nf ||
+        !idCarga ||
+        !arquivo
+      ) {
+        mostrarStatus(
+          "Preencha cliente, NF, ID da carga e anexe um documento.",
+          "erro"
+        );
+
+        return;
+      }
+
+      if (arquivo.size > 20 * 1024 * 1024) {
+        mostrarStatus(
+          "O arquivo está acima do limite de 20 MB.",
+          "erro"
+        );
+
+        return;
+      }
+
+      let partesNome = arquivo.name.split(".");
+      let extensao =
+        partesNome.length > 1
+          ? partesNome.pop().toLowerCase()
+          : "";
+
+      let permitidas = [
+        "pdf",
+        "xml",
+        "png",
+        "jpg",
+        "jpeg"
+      ];
+
+      if (!permitidas.includes(extensao)) {
+        mostrarStatus(
+          "Formato de arquivo não permitido.",
+          "erro"
+        );
+
+        return;
+      }
+
+      definirProcessamento(true);
+
+      mostrarStatus(
+        "Preparando documento...",
+        "neutro"
+      );
+
+      try {
+        let conteudoBase64 =
+          await converterArquivoParaBase64(
+            arquivo
+          );
+
+        let payload = {
+          cliente: cliente,
+          nf: nf,
+          id_carga: idCarga,
+          documento: {
+            nome: arquivo.name,
+            tipo:
+              arquivo.type ||
+              "application/octet-stream",
+            tamanho: arquivo.size,
+            conteudo_base64: conteudoBase64
+          }
+        };
+
+        mostrarStatus(
+          "Enviando documento para a API...",
+          "neutro"
+        );
+
+        let resultado = await chamarAPI(
+          "/api/documentos?v=" + Date.now(),
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        let cargaResultado =
+          resultado.carga || {};
+
+        mostrarStatus(
+          "INTEGRAÇÃO REALIZADA COM SUCESSO\n\n" +
+          "ID da carga: " +
+          (
+            cargaResultado.id_carga ||
+            idCarga
+          ) +
+          "\nCliente: " +
+          (
+            cargaResultado.cliente ||
+            cliente
+          ) +
+          "\nNF: " +
+          (
+            cargaResultado.nf ||
+            nf
+          ) +
+          "\nStatus: " +
+          (
+            cargaResultado.status ||
+            "EXPEDIDA"
+          ) +
+          "\nDocumento: " +
+          arquivo.name,
+          "sucesso"
+        );
+
+        await carregarCargas();
+
+      } catch (erro) {
+        mostrarStatus(
+          "FALHA NA INTEGRAÇÃO\n\n" +
+          erro.message,
+          "erro"
+        );
+      } finally {
+        definirProcessamento(false);
+      }
+    };
 
 
-    setStatus(
-`INTEGRAÇÃO REALIZADA COM SUCESSO
+    limparBtn.onclick = function () {
+      document.getElementById("cliente").value = "";
+      document.getElementById("nf").value = "";
+      document.getElementById("carga").value = "";
 
-Documento enviado para o sistema.
+      arquivoEl.value = "";
 
-ID da carga: ${carga.id_carga || idCarga}
-Cliente: ${carga.cliente || cliente}
-NF: ${carga.nf || nf}
-Status: ${carga.status || "EXPEDIDA"}
-Documento: ${file.name}`,
-      true
-    );
+      document.getElementById(
+        "arquivoInfo"
+      ).textContent =
+        "Nenhum arquivo selecionado";
 
-
-    await carregarCargas();
-
-
-  }
-  catch (erro) {
+      mostrarStatus(
+        "Aguardando ação.",
+        "neutro"
+      );
+    };
 
 
-    setStatus(
-`FALHA NA INTEGRAÇÃO
-
-${erro.message}`
-    );
-
-  }
-
-};
-
-
-/* =========================================================
-   LIMPAR
-   ========================================================= */
-
-document
-  .getElementById("limpar")
-  .onclick =
-() => {
-
-
-  document
-    .getElementById("cliente")
-    .value =
-      "";
-
-
-  document
-    .getElementById("nf")
-    .value =
-      "";
-
-
-  document
-    .getElementById("carga")
-    .value =
-      "";
-
-
-  arquivo.value =
-    "";
-
-
-  document
-    .getElementById(
-      "arquivoInfo"
-    )
-    .textContent =
-      "Nenhum arquivo selecionado";
-
-
-  setStatus(
-    "Aguardando ação."
-  );
-
-};
-
-
-/* =========================================================
-   INICIAR
-   ========================================================= */
-
-carregarCargas();
-
-</script>
+    carregarCargas();
+  </script>
 
 </body>
-</html>
 
-     
+</html> 
