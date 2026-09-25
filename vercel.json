@@ -2,15 +2,15 @@
   "rewrites": [
     {
       "source": "/api/cargas",
-      "destination": "/api"
+      "destination": "/api?rota=cargas"
     },
     {
       "source": "/api/cargas/:id",
-      "destination": "/api"
+      "destination": "/api?rota=carga&id=:id"
     },
     {
       "source": "/api/documentos",
-      "destination": "/api"
+      "destination": "/api?rota=documentos"
     }
   ]
 }
