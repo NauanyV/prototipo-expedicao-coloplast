@@ -20,30 +20,37 @@ def send_json(request_handler, status_code, payload):
     ).encode("utf-8")
 
     request_handler.send_response(status_code)
+
     request_handler.send_header(
         "Content-Type",
         "application/json; charset=utf-8"
     )
+
     request_handler.send_header(
         "Access-Control-Allow-Origin",
         "*"
     )
+
     request_handler.send_header(
         "Access-Control-Allow-Headers",
         "Content-Type, x-api-key"
     )
+
     request_handler.send_header(
         "Access-Control-Allow-Methods",
         "GET, POST, OPTIONS"
     )
+
     request_handler.send_header(
         "Cache-Control",
-        "no-store"
+        "no-store, no-cache, must-revalidate"
     )
+
     request_handler.send_header(
         "Content-Length",
         str(len(content))
     )
+
     request_handler.end_headers()
 
     if status_code != 204:
@@ -98,376 +105,4 @@ class handler(BaseHTTPRequestHandler):
         route, load_id = get_query_parameters(self)
 
         if route == "":
-            return send_json(
-                self,
-                200,
-                {
-                    "api": "Protótipo Analytics Coloplast",
-                    "status": "online",
-                    "banco": "Neon PostgreSQL",
-                    "rotas": [
-                        "GET /api?rota=cargas",
-                        "GET /api?rota=carga&id=141501",
-                        "POST /api?rota=documentos"
-                    ]
-                }
-            )
-
-        if route == "cargas":
-            return self.list_loads()
-
-        if route == "carga":
-            return self.get_load(load_id)
-
-        return send_json(
-            self,
-            404,
-            {
-                "erro": "Rota não encontrada.",
-                "rota": route
-            }
-        )
-
-    def list_loads(self):
-        try:
-            with get_database_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT
-                            id_carga,
-                            cliente,
-                            nf,
-                            status,
-                            documento_nome,
-                            documento_tipo,
-                            data_atualizacao
-                        FROM cargas
-                        ORDER BY id_carga
-                        """
-                    )
-
-                    loads = cursor.fetchall()
-
-            return send_json(
-                self,
-                200,
-                {
-                    "cargas": loads
-                }
-            )
-
-        except Exception as error:
-            print(
-                "Erro ao listar cargas:",
-                repr(error)
-            )
-
-            return send_json(
-                self,
-                500,
-                {
-                    "erro": "Erro ao consultar o banco.",
-                    "detalhe": str(error)
-                }
-            )
-
-    def get_load(self, load_id):
-        if not load_id:
-            return send_json(
-                self,
-                400,
-                {
-                    "erro": "ID da carga não informado."
-                }
-            )
-
-        try:
-            with get_database_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT
-                            id_carga,
-                            cliente,
-                            nf,
-                            status,
-                            documento_nome,
-                            documento_tipo,
-                            data_atualizacao
-                        FROM cargas
-                        WHERE id_carga = %s
-                        """,
-                        (load_id,)
-                    )
-
-                    load = cursor.fetchone()
-
-            if not load:
-                return send_json(
-                    self,
-                    404,
-                    {
-                        "erro": "Carga não encontrada.",
-                        "id_carga": load_id
-                    }
-                )
-
-            return send_json(
-                self,
-                200,
-                load
-            )
-
-        except Exception as error:
-            print(
-                "Erro ao consultar carga:",
-                repr(error)
-            )
-
-            return send_json(
-                self,
-                500,
-                {
-                    "erro": "Erro ao consultar o banco.",
-                    "detalhe": str(error)
-                }
-            )
-
-    def do_POST(self):
-        if not self.is_authorized():
-            return send_json(
-                self,
-                401,
-                {
-                    "erro": "API key inválida."
-                }
-            )
-
-        route, _ = get_query_parameters(self)
-
-        if route != "documentos":
-            return send_json(
-                self,
-                404,
-                {
-                    "erro": "Rota não encontrada.",
-                    "rota": route
-                }
-            )
-
-        return self.save_document()
-
-    def save_document(self):
-        try:
-            content_length = int(
-                self.headers.get(
-                    "Content-Length",
-                    "0"
-                )
-            )
-
-            body = self.rfile.read(content_length)
-
-            payload = json.loads(
-                body.decode("utf-8")
-            )
-
-        except Exception as error:
-            return send_json(
-                self,
-                400,
-                {
-                    "erro": "JSON inválido.",
-                    "detalhe": str(error)
-                }
-            )
-
-        client = str(
-            payload.get("cliente", "")
-        ).strip()
-
-        invoice = str(
-            payload.get("nf", "")
-        ).strip()
-
-        load_id = str(
-            payload.get("id_carga", "")
-        ).strip()
-
-        document = payload.get("documento") or {}
-
-        document_name = str(
-            document.get("nome", "")
-        ).strip()
-
-        document_type = str(
-            document.get("tipo", "")
-        ).strip()
-
-        document_base64 = document.get(
-            "conteudo_base64",
-            ""
-        )
-
-        if (
-            not client
-            or not invoice
-            or not load_id
-            or not document_name
-            or not document_base64
-        ):
-            return send_json(
-                self,
-                400,
-                {
-                    "erro": "Campos obrigatórios ausentes."
-                }
-            )
-
-        try:
-            document_bytes = base64.b64decode(
-                document_base64,
-                validate=True
-            )
-
-        except Exception:
-            return send_json(
-                self,
-                400,
-                {
-                    "erro": "Arquivo Base64 inválido."
-                }
-            )
-
-        if len(document_bytes) > 20 * 1024 * 1024:
-            return send_json(
-                self,
-                413,
-                {
-                    "erro": "Arquivo acima do limite de 20 MB."
-                }
-            )
-
-        try:
-            with get_database_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT
-                            id_carga,
-                            cliente,
-                            nf,
-                            status
-                        FROM cargas
-                        WHERE id_carga = %s
-                        """,
-                        (load_id,)
-                    )
-
-                    load = cursor.fetchone()
-
-                    if not load:
-                        return send_json(
-                            self,
-                            404,
-                            {
-                                "erro": "ID da carga não encontrado.",
-                                "id_carga": load_id
-                            }
-                        )
-
-                    expected_client = str(
-                        load["cliente"]
-                    ).strip()
-
-                    expected_invoice = str(
-                        load["nf"]
-                    ).strip()
-
-                    if expected_client.lower() != client.lower():
-                        return send_json(
-                            self,
-                            409,
-                            {
-                                "erro": (
-                                    "Cliente não corresponde à carga."
-                                ),
-                                "esperado": expected_client,
-                                "recebido": client
-                            }
-                        )
-
-                    if expected_invoice != invoice:
-                        return send_json(
-                            self,
-                            409,
-                            {
-                                "erro": (
-                                    "Número da NF não corresponde à carga."
-                                ),
-                                "esperado": expected_invoice,
-                                "recebido": invoice
-                            }
-                        )
-
-                    cursor.execute(
-                        """
-                        UPDATE cargas
-                        SET
-                            status = 'EXPEDIDA',
-                            documento_nome = %s,
-                            documento_tipo = %s,
-                            data_atualizacao = CURRENT_TIMESTAMP
-                        WHERE id_carga = %s
-                        RETURNING
-                            id_carga,
-                            cliente,
-                            nf,
-                            status,
-                            documento_nome,
-                            documento_tipo,
-                            data_atualizacao
-                        """,
-                        (
-                            document_name,
-                            document_type,
-                            load_id
-                        )
-                    )
-
-                    updated_load = cursor.fetchone()
-
-                connection.commit()
-
-            return send_json(
-                self,
-                200,
-                {
-                    "sucesso": True,
-                    "mensagem": (
-                        "Documento integrado com sucesso."
-                    ),
-                    "documento": {
-                        "nome": document_name,
-                        "tipo": document_type,
-                        "tamanho": len(document_bytes)
-                    },
-                    "carga": updated_load
-                }
-            )
-
-        except Exception as error:
-            print(
-                "Erro ao atualizar carga:",
-                repr(error)
-            )
-
-            return send_json(
-                self,
-                500,
-                {
-                    "erro": "Erro ao atualizar a carga.",
-                    "detalhe": str(error)
-                }
-            )
+            return
