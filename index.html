@@ -424,7 +424,7 @@
         <div class="kpis">
           <div class="kpi">
             <small>Endpoint</small>
-            <strong>/api</strong>
+            <strong>/api/service</strong>
           </div>
 
           <div class="kpi">
@@ -475,6 +475,8 @@
     */
 
     const API_KEY = "vd_140926";
+
+    const API_URL = "/api/service";
 
     const statusBox =
       document.getElementById("status");
@@ -529,17 +531,12 @@
 
 
     async function callApi(url, configuration = {}) {
-      const originalHeaders =
-        configuration.headers || {};
-
-      const headers = {
-        ...originalHeaders,
-        "x-api-key": API_KEY
-      };
-
       const options = {
         ...configuration,
-        headers: headers,
+        headers: {
+          ...(configuration.headers || {}),
+          "x-api-key": API_KEY
+        },
         cache: "no-store"
       };
 
@@ -547,6 +544,7 @@
 
       try {
         response = await fetch(url, options);
+
       } catch (error) {
         throw new Error(
           "Falha ao conectar com a API: " +
@@ -563,6 +561,7 @@
         try {
           responseData =
             JSON.parse(responseText);
+
         } catch (error) {
           throw new Error(
             "HTTP " +
@@ -601,7 +600,8 @@
 
       try {
         const result = await callApi(
-          "/api?rota=cargas&v=" +
+          API_URL +
+          "?rota=cargas&v=" +
           Date.now(),
           {
             method: "GET"
@@ -668,6 +668,7 @@
                 '">' +
                 'Visualizar' +
               '</button>';
+
           } else {
             documentColumn =
               '<span class="no-document">' +
@@ -835,7 +836,8 @@
       try {
         const documentData =
           await callApi(
-            "/api?rota=documento&id=" +
+            API_URL +
+            "?rota=documento&id=" +
             encodeURIComponent(loadId) +
             "&v=" +
             Date.now(),
@@ -868,378 +870,4 @@
           );
 
         const documentUrl =
-          URL.createObjectURL(
-            documentBlob
-          );
-
-        documentWindow.location.href =
-          documentUrl;
-
-        showStatus(
-          "Documento aberto com sucesso: " +
-          fileName,
-          "success"
-        );
-
-        window.setTimeout(
-          function () {
-            URL.revokeObjectURL(
-              documentUrl
-            );
-          },
-          60000
-        );
-
-      } catch (error) {
-        documentWindow.close();
-
-        showStatus(
-          "ERRO AO VISUALIZAR DOCUMENTO\n\n" +
-          error.message,
-          "error"
-        );
-      }
-    }
-
-
-    searchButton.addEventListener(
-      "click",
-      async function () {
-        const loadId =
-          document
-            .getElementById("loadId")
-            .value
-            .trim();
-
-        if (!loadId) {
-          showStatus(
-            "Informe o ID da carga.",
-            "error"
-          );
-
-          return;
-        }
-
-        setButtonsDisabled(true);
-
-        showStatus(
-          "Consultando carga " +
-          loadId +
-          "...",
-          "neutral"
-        );
-
-        try {
-          const result =
-            await callApi(
-              "/api?rota=carga&id=" +
-              encodeURIComponent(loadId) +
-              "&v=" +
-              Date.now(),
-              {
-                method: "GET"
-              }
-            );
-
-          showStatus(
-            "CARGA LOCALIZADA\n\n" +
-            "ID: " +
-            (
-              result.id_carga ||
-              result.id ||
-              ""
-            ) +
-            "\nCliente: " +
-            (
-              result.cliente ||
-              ""
-            ) +
-            "\nNF: " +
-            (
-              result.nf ||
-              ""
-            ) +
-            "\nStatus: " +
-            (
-              result.status ||
-              ""
-            ) +
-            "\nDocumento: " +
-            (
-              result.possui_documento
-                ? "Disponível"
-                : "Não disponível"
-            ),
-            "success"
-          );
-
-        } catch (error) {
-          showStatus(
-            "ERRO AO CONSULTAR CARGA\n\n" +
-            error.message,
-            "error"
-          );
-
-        } finally {
-          setButtonsDisabled(false);
-        }
-      }
-    );
-
-
-    fileInput.addEventListener(
-      "change",
-      function () {
-        const selectedFile =
-          fileInput.files[0];
-
-        const fileInfo =
-          document.getElementById(
-            "fileInfo"
-          );
-
-        if (!selectedFile) {
-          fileInfo.textContent =
-            "Nenhum arquivo selecionado";
-
-          return;
-        }
-
-        const sizeMb =
-          (
-            selectedFile.size /
-            1024 /
-            1024
-          ).toFixed(2);
-
-        fileInfo.textContent =
-          selectedFile.name +
-          " - " +
-          sizeMb +
-          " MB";
-      }
-    );
-
-
-    function convertFileToBase64(file) {
-      return new Promise(
-        function (resolve, reject) {
-          const reader =
-            new FileReader();
-
-          reader.onload =
-            function () {
-              const result =
-                String(reader.result);
-
-              const parts =
-                result.split(",");
-
-              if (parts.length < 2) {
-                reject(
-                  new Error(
-                    "Falha ao converter o arquivo."
-                  )
-                );
-
-                return;
-              }
-
-              resolve(parts[1]);
-            };
-
-          reader.onerror =
-            function () {
-              reject(
-                new Error(
-                  "Falha ao ler o arquivo."
-                )
-              );
-            };
-
-          reader.readAsDataURL(file);
-        }
-      );
-    }
-
-
-    sendButton.addEventListener(
-      "click",
-      async function () {
-        const client =
-          document
-            .getElementById("client")
-            .value;
-
-        const invoice =
-          document
-            .getElementById("invoice")
-            .value
-            .trim();
-
-        const loadId =
-          document
-            .getElementById("loadId")
-            .value
-            .trim();
-
-        const selectedFile =
-          fileInput.files[0];
-
-        if (
-          !client ||
-          !invoice ||
-          !loadId ||
-          !selectedFile
-        ) {
-          showStatus(
-            "Preencha cliente, NF, ID da carga e selecione um documento.",
-            "error"
-          );
-
-          return;
-        }
-
-        if (
-          selectedFile.size >
-          20 * 1024 * 1024
-        ) {
-          showStatus(
-            "O arquivo ultrapassa o limite de 20 MB.",
-            "error"
-          );
-
-          return;
-        }
-
-        setButtonsDisabled(true);
-
-        showStatus(
-          "Preparando documento...",
-          "neutral"
-        );
-
-        try {
-          const fileBase64 =
-            await convertFileToBase64(
-              selectedFile
-            );
-
-          const payload = {
-            cliente: client,
-            nf: invoice,
-            id_carga: loadId,
-            documento: {
-              nome: selectedFile.name,
-              tipo:
-                selectedFile.type ||
-                "application/octet-stream",
-              tamanho:
-                selectedFile.size,
-              conteudo_base64:
-                fileBase64
-            }
-          };
-
-          showStatus(
-            "Enviando documento para a API...",
-            "neutral"
-          );
-
-          const result =
-            await callApi(
-              "/api?rota=documentos&v=" +
-              Date.now(),
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-                body:
-                  JSON.stringify(payload)
-              }
-            );
-
-          const updatedLoad =
-            result.carga || {};
-
-          showStatus(
-            "INTEGRAÇÃO REALIZADA COM SUCESSO\n\n" +
-            "ID da carga: " +
-            (
-              updatedLoad.id_carga ||
-              loadId
-            ) +
-            "\nCliente: " +
-            (
-              updatedLoad.cliente ||
-              client
-            ) +
-            "\nNF: " +
-            (
-              updatedLoad.nf ||
-              invoice
-            ) +
-            "\nStatus: " +
-            (
-              updatedLoad.status ||
-              "EXPEDIDA"
-            ) +
-            "\nDocumento: " +
-            selectedFile.name,
-            "success"
-          );
-
-          await loadAllLoads();
-
-        } catch (error) {
-          showStatus(
-            "FALHA NA INTEGRAÇÃO\n\n" +
-            error.message,
-            "error"
-          );
-
-        } finally {
-          setButtonsDisabled(false);
-        }
-      }
-    );
-
-
-    clearButton.addEventListener(
-      "click",
-      function () {
-        document
-          .getElementById("client")
-          .value = "";
-
-        document
-          .getElementById("invoice")
-          .value = "";
-
-        document
-          .getElementById("loadId")
-          .value = "";
-
-        fileInput.value = "";
-
-        document
-          .getElementById("fileInfo")
-          .textContent =
-            "Nenhum arquivo selecionado";
-
-        showStatus(
-          "Aguardando ação.",
-          "neutral"
-        );
-      }
-    );
-
-
-    loadAllLoads();
-  </script>
-
-</body>
-
-</html>
+     
