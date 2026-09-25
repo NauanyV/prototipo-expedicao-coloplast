@@ -9,7 +9,20 @@ from psycopg.rows import dict_row
 
 
 API_KEY = os.environ.get("API_KEY")
-DATABASE_URL = os.environ.get("NEON_DATABASE_URL")
+
+# ------------------------------------------------------------------
+# CORREÇÃO: aceita vários nomes possíveis de variável de ambiente
+# para a string de conexão do banco. A integração Neon <-> Vercel
+# feita pelo marketplace da Vercel costuma criar a variável como
+# "DATABASE_URL" (ou "POSTGRES_URL"), não "NEON_DATABASE_URL".
+# Se você configurou manualmente com outro nome, adicione-o na
+# lista abaixo.
+# ------------------------------------------------------------------
+DATABASE_URL = (
+    os.environ.get("NEON_DATABASE_URL")
+    or os.environ.get("DATABASE_URL")
+    or os.environ.get("POSTGRES_URL")
+)
 
 MAXIMUM_FILE_SIZE = 20971520
 
@@ -48,10 +61,19 @@ def send_json(request_handler, status_code, payload):
         "no-store, no-cache, must-revalidate"
     )
 
-    request_handler.send_header(
-        "Content-Length",
-        str(len(response_content))
-    )
+    # ------------------------------------------------------------------
+    # CORREÇÃO: no caso de 204 (No Content) o corpo nunca é escrito,
+    # então o header Content-Length não deve ser enviado com o
+    # tamanho de "{}" (isso deixava o header inconsistente com o
+    # corpo real da resposta, o que pode travar o preflight OPTIONS
+    # em navegadores mais rígidos quando front e API estão em
+    # domínios diferentes).
+    # ------------------------------------------------------------------
+    if status_code != 204:
+        request_handler.send_header(
+            "Content-Length",
+            str(len(response_content))
+        )
 
     request_handler.end_headers()
 
@@ -62,7 +84,8 @@ def send_json(request_handler, status_code, payload):
 def get_database_connection():
     if not DATABASE_URL:
         raise RuntimeError(
-            "NEON_DATABASE_URL nao configurada no Vercel."
+            "Variavel de conexao com o banco nao configurada no Vercel "
+            "(esperado NEON_DATABASE_URL, DATABASE_URL ou POSTGRES_URL)."
         )
 
     return psycopg.connect(
