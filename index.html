@@ -33,7 +33,7 @@
     }
 
     .container {
-      max-width: 1120px;
+      max-width: 1180px;
       margin: 28px auto;
       padding: 0 18px;
     }
@@ -67,7 +67,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 1.1fr .9fr;
+      grid-template-columns: 1fr 1.15fr;
       gap: 20px;
     }
 
@@ -145,7 +145,7 @@
     }
 
     button {
-      padding: 12px 17px;
+      padding: 11px 15px;
       border: 0;
       border-radius: 9px;
       font: inherit;
@@ -175,6 +175,18 @@
     .clear {
       background: #fcecec;
       color: var(--red);
+    }
+
+    .document-button {
+      padding: 6px 9px;
+      background: #e9efff;
+      color: #1d4ed8;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .document-button:hover {
+      background: #dce6ff;
     }
 
     .status {
@@ -226,8 +238,13 @@
       font-size: 17px;
     }
 
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
+      min-width: 600px;
       border-collapse: collapse;
       font-size: 12px;
     }
@@ -237,6 +254,11 @@
       padding: 10px 7px;
       border-bottom: 1px solid #edf0f4;
       text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: #4b5563;
     }
 
     .pill {
@@ -245,6 +267,7 @@
       border-radius: 999px;
       font-size: 11px;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .open {
@@ -257,7 +280,12 @@
       color: var(--green);
     }
 
-    @media (max-width: 850px) {
+    .no-document {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 900px) {
       .grid {
         grid-template-columns: 1fr;
       }
@@ -424,32 +452,37 @@
 
         </div>
 
-        <table>
+        <div class="table-wrapper">
 
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Cliente</th>
-              <th>NF</th>
-              <th>Status</th>
-            </tr>
-          </thead>
+          <table>
 
-          <tbody id="loadsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>NF</th>
+                <th>Status</th>
+                <th>Documento</th>
+              </tr>
+            </thead>
 
-            <tr>
-              <td colspan="4">
-                Carregando cargas...
-              </td>
-            </tr>
+            <tbody id="loadsTable">
 
-          </tbody>
+              <tr>
+                <td colspan="5">
+                  Carregando cargas...
+                </td>
+              </tr>
 
-        </table>
+            </tbody>
+
+          </table>
+
+        </div>
 
         <p class="hint">
-          Ao receber o documento, a API valida cliente, NF e ID
-          e altera o status para <b>EXPEDIDA</b>.
+          Ao receber o documento, a API valida cliente, NF e ID,
+          salva a imagem e altera o status para <b>EXPEDIDA</b>.
         </p>
 
       </aside>
@@ -460,10 +493,10 @@
 
   <script>
     /*
-      PREENCHA AQUI A NOVA API KEY.
+      PREENCHA SOMENTE ESTA LINHA.
 
-      Use exatamente o mesmo valor configurado no Vercel
-      e no cabeçalho x-api-key do Power Automate.
+      Coloque entre as aspas a mesma API_KEY configurada
+      no Vercel e usada no Power Automate.
     */
 
     let API_KEY = "vd_140926";
@@ -524,9 +557,7 @@
 
 
     async function callApi(url, configuration) {
-      let options =
-        configuration || {};
-
+      let options = configuration || {};
       let headers = {};
 
       if (options.headers) {
@@ -546,8 +577,7 @@
         }
       }
 
-      headers["x-api-key"] =
-        API_KEY;
+      headers["x-api-key"] = API_KEY;
 
       options.headers = headers;
       options.cache = "no-store";
@@ -555,11 +585,10 @@
       let response;
 
       try {
-        response =
-          await fetch(
-            url,
-            options
-          );
+        response = await fetch(
+          url,
+          options
+        );
 
       } catch (error) {
         throw new Error(
@@ -606,7 +635,7 @@
     async function loadAllLoads() {
       loadsTable.innerHTML =
         '<tr>' +
-          '<td colspan="4">' +
+          '<td colspan="5">' +
             "Carregando cargas..." +
           "</td>" +
         "</tr>";
@@ -635,7 +664,7 @@
         if (result.cargas.length === 0) {
           loadsTable.innerHTML =
             '<tr>' +
-              '<td colspan="4">' +
+              '<td colspan="5">' +
                 "Nenhuma carga encontrada." +
               "</td>" +
             "</tr>";
@@ -675,10 +704,32 @@
             load.status ||
             "";
 
+          let hasDocument =
+            load.possui_documento === true;
+
           let statusClass =
             loadStatus === "EXPEDIDA"
               ? "done"
               : "open";
+
+          let documentColumn;
+
+          if (hasDocument) {
+            documentColumn =
+              '<button ' +
+                'type="button" ' +
+                'class="document-button" ' +
+                'data-load-id="' +
+                escapeHtml(id) +
+                '">' +
+                "Visualizar" +
+              "</button>";
+          } else {
+            documentColumn =
+              '<span class="no-document">' +
+                "Sem documento" +
+              "</span>";
+          }
 
           rows +=
             "<tr>" +
@@ -698,6 +749,9 @@
                   escapeHtml(loadStatus) +
                 "</span>" +
               "</td>" +
+              "<td>" +
+                documentColumn +
+              "</td>" +
             "</tr>";
         }
 
@@ -713,13 +767,198 @@
       } catch (error) {
         loadsTable.innerHTML =
           '<tr>' +
-            '<td colspan="4" style="color:#b91c1c;font-weight:700;">' +
+            '<td colspan="5" style="color:#b91c1c;font-weight:700;">' +
               "Erro ao carregar cargas" +
             "</td>" +
           "</tr>";
 
         showStatus(
           "ERRO DE INTEGRAÇÃO\n\n" +
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    loadsTable.addEventListener(
+      "click",
+      function (event) {
+        let button =
+          event.target.closest(
+            ".document-button"
+          );
+
+        if (!button) {
+          return;
+        }
+
+        let loadId =
+          button.getAttribute(
+            "data-load-id"
+          );
+
+        viewDocument(loadId);
+      }
+    );
+
+
+    function base64ToBlob(
+      base64Content,
+      mimeType
+    ) {
+      let binaryContent =
+        atob(base64Content);
+
+      let byteNumbers =
+        new Array(
+          binaryContent.length
+        );
+
+      for (
+        let index = 0;
+        index < binaryContent.length;
+        index++
+      ) {
+        byteNumbers[index] =
+          binaryContent.charCodeAt(index);
+      }
+
+      let byteArray =
+        new Uint8Array(byteNumbers);
+
+      return new Blob(
+        [byteArray],
+        {
+          type:
+            mimeType ||
+            "application/octet-stream"
+        }
+      );
+    }
+
+
+    async function viewDocument(loadId) {
+      if (!loadId) {
+        showStatus(
+          "ID da carga não informado.",
+          "error"
+        );
+
+        return;
+      }
+
+      /*
+        Abre a aba antes do await para evitar bloqueio
+        de pop-up pelo navegador.
+      */
+
+      let documentWindow =
+        window.open(
+          "",
+          "_blank"
+        );
+
+      if (!documentWindow) {
+        showStatus(
+          "O navegador bloqueou a abertura do documento. Permita pop-ups para este site.",
+          "error"
+        );
+
+        return;
+      }
+
+      documentWindow.document.write(
+        "<!doctype html>" +
+        "<html>" +
+        "<head>" +
+        "<title>Carregando documento</title>" +
+        "</head>" +
+        "<body style='font-family:Segoe UI,Arial,sans-serif;padding:30px;'>" +
+        "<p>Carregando documento...</p>" +
+        "</body>" +
+        "</html>"
+      );
+
+      documentWindow.document.close();
+
+      showStatus(
+        "Carregando documento da carga " +
+        loadId +
+        "...",
+        "neutral"
+      );
+
+      try {
+        let documentData =
+          await callApi(
+            "/api?rota=documento&id=" +
+            encodeURIComponent(loadId) +
+            "&v=" +
+            Date.now(),
+            {
+              method: "GET"
+            }
+          );
+
+        let base64Content =
+          documentData.documento_base64;
+
+        let mimeType =
+          documentData.documento_tipo ||
+          "application/octet-stream";
+
+        let fileName =
+          documentData.documento_nome ||
+          "documento";
+
+        if (!base64Content) {
+          throw new Error(
+            "O documento não possui conteúdo salvo."
+          );
+        }
+
+        let documentBlob =
+          base64ToBlob(
+            base64Content,
+            mimeType
+          );
+
+        let documentUrl =
+          URL.createObjectURL(
+            documentBlob
+          );
+
+        documentWindow.document.title =
+          fileName;
+
+        documentWindow.location.href =
+          documentUrl;
+
+        showStatus(
+          "Documento aberto com sucesso.",
+          "success"
+        );
+
+        window.setTimeout(
+          function () {
+            /*
+              Mantém a URL tempo suficiente para o navegador
+              carregar o arquivo antes de liberar a memória.
+            */
+
+            URL.revokeObjectURL(
+              documentUrl
+            );
+          },
+          60000
+        );
+
+      } catch (error) {
+        documentWindow.close();
+
+        showStatus(
+          "ERRO AO VISUALIZAR DOCUMENTO\n\n" +
           error.message,
           "error"
         );
@@ -787,6 +1026,12 @@
           (
             result.status ||
             ""
+          ) +
+          "\nDocumento: " +
+          (
+            result.possui_documento
+              ? "Disponível"
+              : "Não disponível"
           ),
           "success"
         );
@@ -950,8 +1195,10 @@
             tipo:
               selectedFile.type ||
               "application/octet-stream",
-            tamanho: selectedFile.size,
-            conteudo_base64: fileBase64
+            tamanho:
+              selectedFile.size,
+            conteudo_base64:
+              fileBase64
           }
         };
 
