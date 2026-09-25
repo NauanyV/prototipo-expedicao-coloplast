@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 import base64
 import json
 import os
@@ -11,9 +11,11 @@ from psycopg.rows import dict_row
 API_KEY = os.environ.get("API_KEY")
 DATABASE_URL = os.environ.get("NEON_DATABASE_URL")
 
+MAXIMUM_FILE_SIZE = 20971520
+
 
 def send_json(request_handler, status_code, payload):
-    content = json.dumps(
+    response_content = json.dumps(
         payload,
         ensure_ascii=False,
         default=str
@@ -31,321 +33,376 @@ def send_json(request_handler, status_code, payload):
         "*"
     )
 
-    request_handler.send_header(
-        "Access-Control-Allow-Headers",
-        "Content-Type, x-api-key"
+    request_handle*.send_header(
+        "Access-Cont*ol-Allow-Headers",
+        "Conten*-Type, x-api-key"
     )
 
-    request_handler.send_header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS"
+    reque*t_handler.send_header(
+        "Ac*ess-Control-Allow-Methods",
+      * "GET, POST, OPTIONS"
     )
 
-    request_handler.send_header(
-        "Cache-Control",
-        "no-store, no-cache, must-revalidate"
+    r*quest_handler.send_header(
+       *"Cache-Control",
+        "no-store* no-cache, must-revalidate"
+    )
+*    request_handler.send_header(
+ *      "Content-Length",
+        st*(len(response_content))
     )
 
-    request_handler.send_header(
-        "Content-Length",
-        str(len(content))
-    )
+   *request_handler.end_headers()
 
-    request_handler.end_headers()
-
-    if status_code != 204:
-        request_handler.wfile.write(content)
+   *if status_code != 204:
+        req*est_handler.wfile.write(response_c*ntent)
 
 
-def get_database_connection():
+def get_database_connecti*n():
     if not DATABASE_URL:
-        raise RuntimeError(
-            "NEON_DATABASE_URL não configurada no Vercel."
+    *   raise RuntimeError(
+           *"NEON_DATABASE_URL nao configurada*no Vercel."
         )
 
-    return psycopg.connect(
-        DATABASE_URL,
-        row_factory=dict_row
+    return *sycopg.connect(
+        DATABASE_U*L,
+        row_factory=dict_row,
+ *      connect_timeout=10
     )
 
 
-def get_query_parameters(request_handler):
-    parsed_url = urlparse(request_handler.path)
-    query = parse_qs(parsed_url.query)
+d*f get_request_parameters(request_h*ndler):
+    parsed_url = urlparse(*equest_handler.path)
+    query_par*meters = parse_qs(parsed_url.query*
 
-    route = query.get("rota", [""])[0]
-    load_id = query.get("id", [""])[0]
+    route = query_parameters.get*
+        "rota",
+        [""]
+    *[0]
 
-    return route, load_id
+    load_id = query_parameter*.get(
+        "id",
+        [""]
+ *  )[0]
+
+    return route.strip(), *oad_id.strip()
 
 
-class handler(BaseHTTPRequestHandler):
+def decode_docume*t_base64(base64_content):
+    clea*_content = str(
+        base64_con*ent or ""
+    ).strip()
 
-    def do_OPTIONS(self):
-        return send_json(
-            self,
+    if ",* in clean_content:
+        clean_c*ntent = clean_content.split(
+     *      ",",
+            1
+        )*1]
+
+    return base64.b64decode(
+ *      clean_content,
+        valid*te=True
+    )
+
+
+class handler(Base*TTPRequestHandler):
+
+    def log_m*ssage(self, format_text, *args):
+ *      return
+
+    def do_OPTIONS(s*lf):
+        send_json(
+          * self,
             204,
-            {}
+          * {}
         )
 
-    def is_authorized(self):
-        received_key = self.headers.get("x-api-key")
-
-        return (
-            API_KEY is not None
-            and received_key == API_KEY
+    def is_authoriz*d(self):
+        received_key = se*f.headers.get(
+            "x-api-*ey"
         )
+
+        if not API_*EY:
+            return False
+
+    *   return received_key == API_KEY
+*    def require_authorization(self*:
+        if self.is_authorized():*            return True
+
+        s*nd_json(
+            self,
+       *    401,
+            {
+           *    "erro": "API key invalida."
+  *         }
+        )
+
+        retu*n False
 
     def do_GET(self):
-        try:
-            if not self.is_authorized():
-                return send_json(
-                    self,
-                    401,
-                    {
-                        "erro": "API key inválida."
-                    }
-                )
+   *    if not self.require_authorizat*on():
+            return
 
-            route, load_id = get_query_parameters(self)
+        *ry:
+            route, load_id = g*t_request_parameters(
+            *   self
+            )
 
-            if route == "":
-                return send_json(
-                    self,
-                    200,
-                    {
-                        "api": "Protótipo Analytics Coloplast",
-                        "status": "online",
-                        "banco": "Neon PostgreSQL",
-                        "rotas": [
-                            "GET /api?rota=cargas",
-                            "GET /api?rota=carga&id=141501",
-                            "GET /api?rota=documento&id=141501",
-                            "POST /api?rota=documentos"
-                        ]
-                    }
-                )
+           *if route == "":
+                se*f.get_api_information()
+          *     return
 
-            if route == "cargas":
-                return self.list_loads()
+            if route *= "cargas":
+                self.l*st_loads()
+                return
+*            if route == "carga":
+ *              self.get_load(load_i*)
+                return
 
-            if route == "carga":
-                return self.get_load(load_id)
+        *   if route == "documento":
+      *         self.get_document(load_id*
+                return
 
-            if route == "documento":
-                return self.get_document(load_id)
+         *  send_json(
+                self,*                404,
+             *  {
+                    "erro": "R*ta nao encontrada.",
+             *      "rota": route
+              * }
+            )
 
-            return send_json(
-                self,
-                404,
+        except E*ception as error:
+            prin*(
+                "GET ERROR:",
+  *             repr(error)
+         *  )
+
+            send_json(
+      *         self,
+                500*
                 {
-                    "erro": "Rota não encontrada.",
-                    "rota": route
+               *    "erro": "Erro interno da API."*
+                    "detalhe": st*(error)
                 }
-            )
+        *   )
 
-        except Exception as error:
-            print(
-                "Erro geral no GET:",
-                repr(error)
-            )
+    def get_api_information(*elf):
+        send_json(
+         *  self,
+            200,
+         *  {
+                "api": "Protot*po Analytics Coloplast",
+         *      "status": "online",
+        *       "database": "Neon PostgreSQ*",
+                "routes": [
+                    "GET /api?rota=cargas",
+                    "GET /api?rota=carga&id=141501",
+                    "GET /api?rota=documento&id=141501",
+                    "POST /api?rota=documentos"
+                ]
+            }
+        )
 
-            return send_json(
-                self,
-                500,
-                {
-                    "erro": "Erro interno da API.",
-                    "detalhe": str(error)
-                }
-            )
-
-    def list_loads(self):
-        try:
-            with get_database_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
+   *def list_loads(self):
+        try:*            with get_database_conn*ction() as connection:
+           *    with connection.cursor() as cu*sor:
+                    cursor.ex*cute(
                         """
-                        SELECT
-                            id_carga,
-                            cliente,
-                            nf,
-                            status,
-                            documento_nome,
-                            documento_tipo,
-                            CASE
-                                WHEN documento_base64 IS NOT NULL
-                                     AND documento_base64 <> ''
-                                THEN TRUE
-                                ELSE FALSE
-                            END AS possui_documento,
-                            data_atualizacao
-                        FROM cargas
-                        ORDER BY id_carga
-                        """
+*                       SELECT
+    *                       id_carga,
+ *                          cliente,*                            nf,
+  *                         status,
+ *                          document*_nome,
+                           *documento_tipo,
+                  *         CASE
+                    *           WHEN documento_base64 I* NOT NULL
+                        *        AND documento_base64 != ''*                                TH*N TRUE
+                           *    ELSE FALSE
+                   *        END AS possui_documento,
+ *                          data_atu*lizacao
+                        FR*M cargas
+                        O*DER BY id_carga
+                  *     """
                     )
 
-                    loads = cursor.fetchall()
+  *                 loads = cursor.fe*chall()
 
-            return send_json(
+            send_json(
+  *             self,
+               *200,
+                {
+           *        "cargas": loads
+          *     }
+            )
+
+        exce*t Exception as error:
+            *rint(
+                "LIST LOADS *RROR:",
+                repr(error*
+            )
+
+            send_j*on(
                 self,
+        *       500,
+                {
+    *               "erro": "Erro ao co*sultar o banco.",
+                *   "detalhe": str(error)
+         *      }
+            )
+
+    def get*load(self, load_id):
+        if no* load_id:
+            send_json(
+ *              self,
+              * 400,
+                {
+          *         "erro": "ID da carga nao *nformado."
+                }
+     *      )
+            return
+
+      * try:
+            with get_databas*_connection() as connection:
+     *          with connection.cursor()*as cursor:
+                    cur*or.execute(
+                      * """
+                        SELEC*
+                            id_ca*ga,
+                            cl*ente,
+                            *f,
+                            sta*us,
+                            do*umento_nome,
+                     *      documento_tipo,
+            *               CASE
+              *                 WHEN documento_ba*e64 IS NOT NULL
+                  *              AND documento_base64*!= ''
+                            *   THEN TRUE
+                     *          ELSE FALSE
+             *              END AS possui_docume*to,
+                            da*a_atualizacao
+                    *   FROM cargas
+                   *    WHERE id_carga = %s
+          *             """,
+                *       (load_id,)
+                *   )
+
+                    load = c*rsor.fetchone()
+
+            if no* load:
+                send_json(
+*                   self,
+         *          404,
+                   *{
+                        "erro": *Carga nao encontrada.",
+          *             "id_carga": load_id
+ *                  }
+              * )
+                return
+
+       *    send_json(
+                sel*,
                 200,
-                {
-                    "cargas": loads
-                }
+           *    load
             )
 
-        except Exception as error:
-            print(
-                "Erro ao listar cargas:",
-                repr(error)
+        ex*ept Exception as error:
+          * print(
+                "GET LOAD *RROR:",
+                repr(error*
             )
 
-            return send_json(
+            send_j*on(
                 self,
-                500,
+        *       500,
                 {
-                    "erro": "Erro ao consultar o banco.",
-                    "detalhe": str(error)
-                }
+    *               "erro": "Erro ao co*sultar a carga.",
+                *   "detalhe": str(error)
+         *      }
             )
 
-    def get_load(self, load_id):
-        if not load_id:
-            return send_json(
+    def get*document(self, load_id):
+        i* not load_id:
+            send_jso*(
                 self,
-                400,
+          *     400,
                 {
-                    "erro": "ID da carga não informado."
+      *             "erro": "ID da carga *ao informado."
                 }
-            )
+ *          )
+            return
 
-        try:
-            with get_database_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT
-                            id_carga,
-                            cliente,
-                            nf,
-                            status,
-                            documento_nome,
-                            documento_tipo,
-                            CASE
-                                WHEN documento_base64 IS NOT NULL
-                                     AND documento_base64 <> ''
-                                THEN TRUE
-                                ELSE FALSE
-                            END AS possui_documento,
-                            data_atualizacao
-                        FROM cargas
-                        WHERE id_carga = %s
-                        """,
-                        (load_id,)
+  *     try:
+            with get_dat*base_connection() as connection:
+ *              with connection.curs*r() as cursor:
+                   *cursor.execute(
+                  *     """
+                        S*LECT
+                            i*_carga,
+                          * documento_nome,
+                 *          documento_tipo,
+        *                   documento_base6*
+                        FROM carg*s
+                        WHERE id*carga = %s
+                       *""",
+                        (load*id,)
                     )
 
-                    load = cursor.fetchone()
+      *             document = cursor.fet*hone()
 
-            if not load:
-                return send_json(
+            if not documen*:
+                send_json(
+     *              self,
+              *     404,
+                    {
+  *                     "erro": "Carg* nao encontrada.",
+               *        "id_carga": load_id
+      *             }
+                )
+ *              return
+
+            *ocument_base64 = document[
+                "documento_base64"
+            ]
+
+            if not document*base64:
+                send_json(
                     self,
                     404,
                     {
-                        "erro": "Carga não encontrada.",
+                        "erro": "A carga nao possui documento salvo.",
                         "id_carga": load_id
                     }
                 )
+                return
 
-            return send_json(
-                self,
-                200,
-                load
-            )
-
-        except Exception as error:
-            print(
-                "Erro ao consultar carga:",
-                repr(error)
-            )
-
-            return send_json(
-                self,
-                500,
-                {
-                    "erro": "Erro ao consultar o banco.",
-                    "detalhe": str(error)
-                }
-            )
-
-    def get_document(self, load_id):
-        if not load_id:
-            return send_json(
-                self,
-                400,
-                {
-                    "erro": "ID da carga não informado."
-                }
-            )
-
-        try:
-            with get_database_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT
-                            id_carga,
-                            documento_nome,
-                            documento_tipo,
-                            documento_base64
-                        FROM cargas
-                        WHERE id_carga = %s
-                        """,
-                        (load_id,)
-                    )
-
-                    document = cursor.fetchone()
-
-            if not document:
-                return send_json(
-                    self,
-                    404,
-                    {
-                        "erro": "Carga não encontrada.",
-                        "id_carga": load_id
-                    }
-                )
-
-            if not document["documento_base64"]:
-                return send_json(
-                    self,
-                    404,
-                    {
-                        "erro": "A carga não possui documento salvo.",
-                        "id_carga": load_id
-                    }
-                )
-
-            return send_json(
+            send_json(
                 self,
                 200,
                 {
-                    "id_carga": document["id_carga"],
-                    "documento_nome": document["documento_nome"],
+                    "id_carga": document[
+                        "id_carga"
+                    ],
+                    "documento_nome": (
+                        document["documento_nome"]
+                        or "documento"
+                    ),
                     "documento_tipo": (
                         document["documento_tipo"]
                         or "application/octet-stream"
                     ),
-                    "documento_base64": document["documento_base64"]
+                    "documento_base64": (
+                        document_base64
+                    )
                 }
             )
 
         except Exception as error:
             print(
-                "Erro ao consultar documento:",
+                "GET DOCUMENT ERROR:",
                 repr(error)
             )
 
-            return send_json(
+            send_json(
                 self,
                 500,
                 {
@@ -355,37 +412,34 @@ class handler(BaseHTTPRequestHandler):
             )
 
     def do_POST(self):
-        try:
-            if not self.is_authorized():
-                return send_json(
-                    self,
-                    401,
-                    {
-                        "erro": "API key inválida."
-                    }
-                )
+        if not self.require_authorization():
+            return
 
-            route, _ = get_query_parameters(self)
+        try:
+            route, unused_load_id = (
+                get_request_parameters(self)
+            )
 
             if route != "documentos":
-                return send_json(
+                send_json(
                     self,
                     404,
                     {
-                        "erro": "Rota não encontrada.",
+                        "erro": "Rota nao encontrada.",
                         "rota": route
                     }
                 )
+                return
 
-            return self.save_document()
+            self.save_document()
 
         except Exception as error:
             print(
-                "Erro geral no POST:",
+                "POST ERROR:",
                 repr(error)
             )
 
-            return send_json(
+            send_json(
                 self,
                 500,
                 {
@@ -394,125 +448,178 @@ class handler(BaseHTTPRequestHandler):
                 }
             )
 
+    def read_request_json(self):
+        content_length_text = self.headers.get(
+            "Content-Length",
+            "0"
+        )
+
+        content_length = int(
+            content_length_text
+        )
+
+        if content_length <= 0:
+            raise ValueError(
+                "Corpo da requisicao vazio."
+            )
+
+        request_body = self.rfile.read(
+            content_length
+        )
+
+        return json.loads(
+            request_body.decode("utf-8")
+        )
+
     def save_document(self):
         try:
-            content_length = int(
-                self.headers.get(
-                    "Content-Length",
-                    "0"
-                )
-            )
+            payload = self.read_request_json()
 
-            if content_length <= 0:
-                return send_json(
-                    self,
-                    400,
-                    {
-                        "erro": "Corpo da requisição vazio."
-                    }
-                )
-
-            body = self.rfile.read(content_length)
-
-            payload = json.loads(
-                body.decode("utf-8")
-            )
-
-        except Exception as error:
-            return send_json(
+        except ValueError as error:
+            send_json(
                 self,
                 400,
                 {
-                    "erro": "JSON inválido.",
+                    "erro": str(error)
+                }
+            )
+            return
+
+        except Exception as error:
+            send_json(
+                self,
+                400,
+                {
+                    "erro": "JSON invalido.",
                     "detalhe": str(error)
                 }
             )
+            return
 
         client = str(
-            payload.get("cliente", "")
+            payload.get(
+                "cliente",
+                ""
+            )
         ).strip()
 
         invoice = str(
-            payload.get("nf", "")
+            payload.get(
+                "nf",
+                ""
+            )
         ).strip()
 
         load_id = str(
-            payload.get("id_carga", "")
+            payload.get(
+                "id_carga",
+                ""
+            )
         ).strip()
 
-        document = payload.get("documento") or {}
+        document = payload.get(
+            "documento"
+        ) or {}
 
         document_name = str(
-            document.get("nome", "")
+            document.get(
+                "nome",
+                ""
+            )
         ).strip()
 
         document_type = str(
-            document.get("tipo", "")
+            document.get(
+                "tipo",
+                ""
+            )
         ).strip()
 
         document_base64 = str(
-            document.get("conteudo_base64", "")
+            document.get(
+                "conteudo_base64",
+                ""
+            )
         ).strip()
 
         if not document_type:
-            document_type = "application/octet-stream"
+            document_type = (
+                "application/octet-stream"
+            )
 
-        if (
-            not client
-            or not invoice
-            or not load_id
-            or not document_name
-            or not document_base64
-        ):
-            return send_json(
+        missing_fields = []
+
+        if not client:
+            missing_fields.append(
+                "cliente"
+            )
+
+        if not invoice:
+            missing_fields.append(
+                "nf"
+            )
+
+        if not load_id:
+            missing_fields.append(
+                "id_carga"
+            )
+
+        if not document_name:
+            missing_fields.append(
+                "documento.nome"
+            )
+
+        if not document_base64:
+            missing_fields.append(
+                "documento.conteudo_base64"
+            )
+
+        if missing_fields:
+            send_json(
                 self,
                 400,
                 {
-                    "erro": "Campos obrigatórios ausentes.",
-                    "campos_obrigatorios": [
-                        "cliente",
-                        "nf",
-                        "id_carga",
-                        "documento.nome",
-                        "documento.conteudo_base64"
-                    ]
+                    "erro": "Campos obrigatorios ausentes.",
+                    "campos": missing_fields
                 }
             )
+            return
 
         try:
-            document_bytes = base64.b64decode(
+            document_bytes = decode_document_base64(
                 document_base64
             )
 
         except Exception as error:
-            return send_json(
+            send_json(
                 self,
                 400,
                 {
-                    "erro": "Arquivo Base64 inválido.",
+                    "erro": "Arquivo Base64 invalido.",
                     "detalhe": str(error)
                 }
             )
+            return
 
-        if not document_bytes:
-            return send_json(
+        if len(document_bytes) == 0:
+            send_json(
                 self,
                 400,
                 {
-                    "erro": "O arquivo recebido está vazio."
+                    "erro": "O arquivo recebido esta vazio."
                 }
             )
+            return
 
-        maximum_size = 20 * 1024 * 1024
-
-        if len(document_bytes) > maximum_size:
-            return send_json(
+        if len(document_bytes) > MAXIMUM_FILE_SIZE:
+            send_json(
                 self,
                 413,
                 {
                     "erro": "Arquivo acima do limite de 20 MB."
                 }
             )
+            return
 
         try:
             with get_database_connection() as connection:
@@ -533,14 +640,15 @@ class handler(BaseHTTPRequestHandler):
                     load = cursor.fetchone()
 
                     if not load:
-                        return send_json(
+                        send_json(
                             self,
                             404,
                             {
-                                "erro": "ID da carga não encontrado.",
+                                "erro": "ID da carga nao encontrado.",
                                 "id_carga": load_id
                             }
                         )
+                        return
 
                     expected_client = str(
                         load["cliente"]
@@ -550,31 +658,36 @@ class handler(BaseHTTPRequestHandler):
                         load["nf"]
                     ).strip()
 
-                    if expected_client.lower() != client.lower():
-                        return send_json(
+                    if (
+                        expected_client.lower()
+                        != client.lower()
+                    ):
+                        send_json(
                             self,
                             409,
                             {
                                 "erro": (
-                                    "Cliente não corresponde à carga."
+                                    "Cliente nao corresponde a carga."
                                 ),
                                 "esperado": expected_client,
                                 "recebido": client
                             }
                         )
+                        return
 
                     if expected_invoice != invoice:
-                        return send_json(
+                        send_json(
                             self,
                             409,
                             {
                                 "erro": (
-                                    "Número da NF não corresponde à carga."
+                                    "Numero da NF nao corresponde a carga."
                                 ),
                                 "esperado": expected_invoice,
                                 "recebido": invoice
                             }
                         )
+                        return
 
                     cursor.execute(
                         """
@@ -591,3 +704,53 @@ class handler(BaseHTTPRequestHandler):
                             cliente,
                             nf,
                             status,
+                            documento_nome,
+                            documento_tipo,
+                            TRUE AS possui_documento,
+                            data_atualizacao
+                        """,
+                        (
+                            document_name,
+                            document_type,
+                            document_base64,
+                            load_id
+                        )
+                    )
+
+                    updated_load = cursor.fetchone()
+
+                connection.commit()
+
+            send_json(
+                self,
+                200,
+                {
+                    "sucesso": True,
+                    "mensagem": (
+                        "Documento integrado com sucesso."
+                    ),
+                    "documento": {
+                        "nome": document_name,
+                        "tipo": document_type,
+                        "tamanho": len(
+                            document_bytes
+                        )
+                    },
+                    "carga": updated_load
+                }
+            )
+
+        except Exception as error:
+            print(
+                "SAVE DOCUMENT ERROR:",
+                repr(error)
+            )
+
+            send_json(
+                self,
+                500,
+                {
+                    "erro": "Erro ao atualizar a carga.",
+                    "detalhe": str(error)
+                }
+            )
