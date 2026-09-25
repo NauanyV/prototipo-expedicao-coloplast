@@ -1,7 +1,15 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/api/cargas",
+      "destination": "/api"
+    },
+    {
+      "source": "/api/cargas/:id",
+      "destination": "/api"
+    },
+    {
+      "source": "/api/documentos",
       "destination": "/api"
     }
   ]
