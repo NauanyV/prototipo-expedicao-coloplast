@@ -460,11 +460,19 @@
 
   <script>
     /*
-      PREENCHA SOMENTE A LINHA ABAIXO.
-      Use a mesma API_KEY do Vercel e do Power Automate.
+      ========================================================
+      CONFIGURAÇÃO OBRIGATÓRIA
+      ========================================================
+      Substitua o valor abaixo pela MESMA chave que você
+      configurou na variável de ambiente API_KEY no Vercel.
+
+      Se essa chave ficar como "COLE_SUA_CHAVE_AQUI" (ou for
+      diferente da variável API_KEY do Vercel), toda chamada
+      vai retornar 401 "API key invalida." e nada vai funcionar.
+      ========================================================
     */
 
-    const API_KEY = "COLE_SUA_CHAVE_AQUI";
+    const API_KEY = "vd_140926";
     const API_URL = "/api";
 
     const statusBox = document.getElementById("status");
@@ -539,7 +547,8 @@
           throw new Error(
             "HTTP " +
             response.status +
-            ": resposta inválida da API."
+            ": resposta inválida da API. Corpo recebido: " +
+            responseText.slice(0, 300)
           );
         }
       }
@@ -552,6 +561,11 @@
           (
             responseData.erro ||
             "erro retornado pela API"
+          ) +
+          (
+            responseData.detalhe
+              ? ("\nDetalhe: " + responseData.detalhe)
+              : ""
           )
         );
       }
