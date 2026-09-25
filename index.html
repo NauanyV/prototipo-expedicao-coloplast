@@ -3,216 +3,1148 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Novo documento — Coloplast | Protótipo</title>
+
+<title>Novo documento - Coloplast | Protótipo</title>
+
 <style>
-  :root {
-    --bg:#f5f7fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
-    --border:#d9dee8; --accent:#2457d6; --accent2:#1744b0;
-    --success:#15803d; --warning:#b45309; --danger:#b91c1c;
+:root {
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#d9dee8;
+  --accent:#2457d6;
+  --accent2:#1744b0;
+  --success:#15803d;
+  --warning:#b45309;
+  --danger:#b91c1c;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  margin:0;
+  font-family:Segoe UI, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.wrap {
+  max-width:1100px;
+  margin:28px auto;
+  padding:0 18px;
+}
+
+.top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:18px;
+}
+
+h1 {
+  font-size:24px;
+  margin:0 0 4px;
+}
+
+.sub {
+  color:var(--muted);
+  margin:0;
+}
+
+.badge {
+  padding:7px 10px;
+  border-radius:999px;
+  background:#e9efff;
+  color:#1d4ed8;
+  font-size:12px;
+  font-weight:700;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:18px;
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 2px 12px rgba(31,41,55,.04);
+}
+
+.card h2 {
+  font-size:16px;
+  margin:0 0 16px;
+}
+
+label {
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin:0 0 7px;
+}
+
+input,
+select,
+textarea {
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  font:inherit;
+  background:#fff;
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(36,87,214,.1);
+}
+
+.field {
+  margin-bottom:15px;
+}
+
+.req {
+  color:var(--danger);
+}
+
+.hint {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+.drop {
+  border:1.5px dashed #aab3c2;
+  border-radius:10px;
+  padding:18px;
+  text-align:center;
+  background:#fafbfe;
+}
+
+.drop input {
+  border:0;
+  padding:0;
+  background:transparent;
+}
+
+.file {
+  margin-top:10px;
+  font-size:13px;
+  color:var(--muted);
+  word-break:break-word;
+}
+
+.btns {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+button {
+  border:0;
+  border-radius:9px;
+  padding:11px 15px;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary {
+  background:var(--accent);
+  color:white;
+}
+
+.primary:hover {
+  background:var(--accent2);
+}
+
+.secondary {
+  background:#edf1f7;
+  color:#263244;
+}
+
+.danger {
+  background:#fcecec;
+  color:var(--danger);
+}
+
+.status {
+  margin-top:16px;
+  padding:12px 14px;
+  border-radius:10px;
+  background:#f6f7f9;
+  font-size:13px;
+  white-space:pre-wrap;
+  min-height:44px;
+}
+
+.kpis {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.kpi {
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px;
+}
+
+.kpi b {
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+.kpi span {
+  font-size:18px;
+  font-weight:800;
+}
+
+.table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  margin-top:12px;
+}
+
+.table th,
+.table td {
+  border-bottom:1px solid #edf0f4;
+  text-align:left;
+  padding:9px 6px;
+}
+
+.pill {
+  display:inline-block;
+  padding:4px 7px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:11px;
+}
+
+.pill-open {
+  background:#fff4d9;
+  color:var(--warning);
+}
+
+.pill-done {
+  background:#e9f8ee;
+  color:var(--success);
+}
+
+.api {
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:12px;
+  line-height:1.6;
+}
+
+@media(max-width:850px) {
+  .grid {
+    grid-template-columns:1fr;
   }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:Segoe UI, Arial, sans-serif; background:var(--bg); color:var(--text); }
-  .wrap { max-width:1100px; margin:28px auto; padding:0 18px; }
-  .top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:18px; }
-  h1 { font-size:24px; margin:0 0 4px; }
-  .sub { color:var(--muted); margin:0; }
-  .badge { padding:7px 10px; border-radius:999px; background:#e9efff; color:#1d4ed8; font-size:12px; font-weight:700; }
-  .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; box-shadow:0 2px 12px rgba(31,41,55,.04); }
-  .card h2 { font-size:16px; margin:0 0 16px; }
-  label { display:block; font-size:13px; font-weight:700; margin:0 0 7px; }
-  input, select, textarea {
-    width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:9px;
-    font:inherit; background:#fff; outline:none;
-  }
-  input:focus, select:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(36,87,214,.1); }
-  .field { margin-bottom:15px; }
-  .req { color:var(--danger); }
-  .hint { font-size:12px; color:var(--muted); margin-top:6px; }
-  .drop {
-    border:1.5px dashed #aab3c2; border-radius:10px; padding:18px; text-align:center;
-    background:#fafbfe;
-  }
-  .drop input { border:0; padding:0; background:transparent; }
-  .file { margin-top:10px; font-size:13px; color:var(--muted); word-break:break-word; }
-  .btns { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
-  button { border:0; border-radius:9px; padding:11px 15px; font:inherit; font-weight:700; cursor:pointer; }
-  .primary { background:var(--accent); color:white; }
-  .primary:hover { background:var(--accent2); }
-  .secondary { background:#edf1f7; color:#263244; }
-  .danger { background:#fcecec; color:var(--danger); }
-  .status {
-    margin-top:16px; padding:12px 14px; border-radius:10px; background:#f6f7f9;
-    font-size:13px; white-space:pre-wrap; min-height:44px;
-  }
-  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .kpi { border:1px solid var(--border); border-radius:10px; padding:13px; }
-  .kpi b { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
-  .kpi span { font-size:18px; font-weight:800; }
-  .table { width:100%; border-collapse:collapse; font-size:12px; margin-top:12px; }
-  .table th,.table td { border-bottom:1px solid #edf0f4; text-align:left; padding:9px 6px; }
-  .pill { display:inline-block; padding:4px 7px; border-radius:999px; font-weight:700; font-size:11px; }
-  .pill-open { background:#fff4d9; color:var(--warning); }
-  .pill-done { background:#e9f8ee; color:var(--success); }
-  .api { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; line-height:1.6; }
-  @media(max-width:850px){ .grid{grid-template-columns:1fr;} }
+}
 </style>
+
 </head>
+
 <body>
+
 <div class="wrap">
+
   <div class="top">
+
     <div>
       <h1>Novo documento</h1>
-      <p class="sub">Protótipo básico para simular a entrada de documentos da expedição.</p>
+      <p class="sub">
+        Protótipo básico para simular a entrada de documentos da expedição.
+      </p>
     </div>
-    <div class="badge">MOCK API • DEMONSTRAÇÃO</div>
+
+    <div class="badge">
+      MOCK API • DEMONSTRAÇÃO
+    </div>
+
   </div>
 
   <div class="grid">
+
     <section class="card">
-      <h2>Preencha os dados e anexe os arquivos para inserir novos documentos.</h2>
+
+      <h2>
+        Preencha os dados e anexe os arquivos para inserir novos documentos.
+      </h2>
 
       <div class="field">
-        <label for="cliente">Selecionar cliente <span class="req">*</span></label>
+
+        <label for="cliente">
+          Selecionar cliente <span class="req">*</span>
+        </label>
+
         <select id="cliente">
-          <option value="">Selecionar cliente</option>
-          <option value="Coloplast">Coloplast</option>
-          <option value="Voge">Voge</option>
-          <option value="Outro">Outro</option>
+
+          <option value="">
+            Selecionar cliente
+          </option>
+
+          <option value="Coloplast">
+            Coloplast
+          </option>
+
+          <option value="Voge">
+            Voge
+          </option>
+
+          <option value="Outro">
+            Outro
+          </option>
+
         </select>
+
       </div>
 
       <div class="field">
-        <label for="nf">Número da nota <span class="req">*</span></label>
-        <input id="nf" type="text" placeholder="Ex.: 21007">
+
+        <label for="nf">
+          Número da nota <span class="req">*</span>
+        </label>
+
+        <input
+          id="nf"
+          type="text"
+          placeholder="Ex.: 21007"
+        >
+
       </div>
 
       <div class="field">
-        <label for="carga">Número do ID de carga <span class="req">*</span></label>
-        <input id="carga" type="text" placeholder="Ex.: 141501">
-        <div class="hint">O ID da carga é o identificador usado para localizar a carga na simulação.</div>
-      </div>
 
-      <div class="field">
-        <label>Documentos <span class="req">*</span></label>
-        <div class="drop">
-          <input id="arquivo" type="file" accept=".pdf,.xml,.png,.jpg,.jpeg">
-          <div class="hint">Aceita PDF, XML, PNG ou JPG com até 20 MB.</div>
-          <div class="file" id="arquivoInfo">Nenhum arquivo selecionado</div>
+        <label for="carga">
+          Número do ID de carga <span class="req">*</span>
+        </label>
+
+        <input
+          id="carga"
+          type="text"
+          placeholder="Ex.: 141501"
+        >
+
+        <div class="hint">
+          O ID da carga é o identificador usado para localizar a carga na simulação.
         </div>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Documentos <span class="req">*</span>
+        </label>
+
+        <div class="drop">
+
+          <input
+            id="arquivo"
+            type="file"
+            accept=".pdf,.xml,.png,.jpg,.jpeg"
+          >
+
+          <div class="hint">
+            Aceita PDF, XML, PNG ou JPG com até 20 MB.
+          </div>
+
+          <div
+            class="file"
+            id="arquivoInfo"
+          >
+            Nenhum arquivo selecionado
+          </div>
+
+        </div>
+
       </div>
 
       <div class="btns">
-        <button class="primary" id="enviar">Enviar documento</button>
-        <button class="secondary" id="buscar">Consultar carga</button>
-        <button class="danger" id="limpar">Limpar</button>
+
+        <button
+          class="primary"
+          id="enviar"
+        >
+          Enviar documento
+        </button>
+
+        <button
+          class="secondary"
+          id="buscar"
+        >
+          Consultar carga
+        </button>
+
+        <button
+          class="danger"
+          id="limpar"
+        >
+          Limpar
+        </button>
+
       </div>
 
-      <div class="status" id="status">Aguardando ação.</div>
+      <div
+        class="status"
+        id="status"
+      >
+        Carregando integração...
+      </div>
+
     </section>
 
     <aside class="card">
-      <h2>Simulação do Analytics</h2>
+
+      <h2>
+        Simulação do Analytics
+      </h2>
+
       <div class="kpis">
-        <div class="kpi"><b>Endpoint</b><span class="api">/api</span></div>
-        <div class="kpi"><b>Autenticação</b><span class="api">x-api-key</span></div>
+
+        <div class="kpi">
+          <b>Endpoint</b>
+          <span class="api">/api</span>
+        </div>
+
+        <div class="kpi">
+          <b>Autenticação</b>
+          <span class="api">x-api-key</span>
+        </div>
+
       </div>
 
       <table class="table">
-        <thead><tr><th>ID</th><th>Cliente</th><th>NF</th><th>Status</th></tr></thead>
-        <tbody id="cargas"></tbody>
+
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>NF</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="cargas">
+
+          <tr>
+            <td colspan="4">
+              Carregando cargas...
+            </td>
+          </tr>
+
+        </tbody>
+
       </table>
 
       <p class="hint" style="margin-top:14px">
-        A API mock simula uma base do Analytics. Ao enviar um documento, ela valida cliente + NF + ID,
-        registra o arquivo e altera o status da carga para <b>EXPEDIDA</b>.
+
+        A API mock simula uma base do Analytics.
+        Ao receber um documento, a API valida cliente + NF + ID,
+        registra o documento e altera o status da carga para
+        <b>EXPEDIDA</b>.
+
       </p>
+
     </aside>
+
   </div>
+
 </div>
 
+
 <script>
+
+/* =========================================================
+   CONFIGURAÇÃO
+   ========================================================= */
+
 const API_KEY = "140926";
-const statusEl = document.getElementById("status");
-const cargasEl = document.getElementById("cargas");
-const arquivo = document.getElementById("arquivo");
 
-arquivo.addEventListener("change", () => {
-  const f = arquivo.files[0];
-  document.getElementById("arquivoInfo").textContent =
-    f ? `${f.name} — ${(f.size/1024/1024).toFixed(2)} MB` : "Nenhum arquivo selecionado";
-});
 
-function setStatus(msg, ok=false){
-  statusEl.textContent = msg;
-  statusEl.style.background = ok ? "#eaf8ef" : "#f6f7f9";
+const statusEl =
+  document.getElementById("status");
+
+const cargasEl =
+  document.getElementById("cargas");
+
+const arquivo =
+  document.getElementById("arquivo");
+
+
+/* =========================================================
+   ARQUIVO
+   ========================================================= */
+
+arquivo.addEventListener(
+  "change",
+  () => {
+
+    const f =
+      arquivo.files[0];
+
+    document
+      .getElementById("arquivoInfo")
+      .textContent =
+        f
+          ? `${f.name} - ${(f.size / 1024 / 1024).toFixed(2)} MB`
+          : "Nenhum arquivo selecionado";
+
+  }
+);
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function setStatus(
+  mensagem,
+  sucesso = false
+) {
+
+  statusEl.textContent =
+    mensagem;
+
+  statusEl.style.background =
+    sucesso
+      ? "#eaf8ef"
+      : "#fcecec";
+
+  statusEl.style.color =
+    sucesso
+      ? "#15803d"
+      : "#b91c1c";
+
 }
 
-async function carregarCargas(){
-  const r = await fetch("/api/cargas", {headers: {"x-api-key": API_KEY}});
-  const data = await r.json();
-  cargasEl.innerHTML = data.cargas.map(c => `
-    <tr>
-      <td>${c.id}</td>
-      <td>${c.cliente}</td>
-      <td>${c.nf}</td>
-      <td><span class="pill ${c.status==="EXPEDIDA" ? "pill-done":"pill-open"}">${c.status}</span></td>
-    </tr>`).join("");
-}
 
-document.getElementById("buscar").onclick = async () => {
-  const id = document.getElementById("carga").value.trim();
-  if(!id) return setStatus("Informe o ID de carga.");
-  const r = await fetch(`/api/cargas/${encodeURIComponent(id)}`, {headers: {"x-api-key": API_KEY}});
-  const data = await r.json();
-  setStatus(r.ok ? JSON.stringify(data, null, 2) : `Erro: ${data.erro || "carga não encontrada"}`, r.ok);
-};
+/* =========================================================
+   FUNÇÃO CENTRAL DE ACESSO À API
+   ========================================================= */
 
-document.getElementById("enviar").onclick = async () => {
-  const cliente = document.getElementById("cliente").value;
-  const nf = document.getElementById("nf").value.trim();
-  const carga = document.getElementById("carga").value.trim();
-  const file = arquivo.files[0];
+async function apiRequest(
+  url,
+  options = {}
+) {
 
-  if(!cliente || !nf || !carga || !file) return setStatus("Preencha cliente, NF, ID de carga e anexe um documento.");
-  if(file.size > 20 * 1024 * 1024) return setStatus("Arquivo acima do limite de 20 MB.");
-  const allowed = ["application/pdf","application/xml","text/xml","image/png","image/jpeg"];
-  const ext = file.name.split(".").pop().toLowerCase();
-  if(!["pdf","xml","png","jpg","jpeg"].includes(ext)) return setStatus("Formato não permitido.");
-
-  setStatus("Enviando para a API mock...");
-  const base64 = await new Promise((resolve,reject)=>{
-    const fr = new FileReader();
-    fr.onload = () => resolve(String(fr.result).split(",")[1]);
-    fr.onerror = reject;
-    fr.readAsDataURL(file);
-  });
-
-  const payload = {
-    cliente, nf, id_carga: carga,
-    documento: {nome:file.name, tipo:file.type || ext, tamanho:file.size, conteudo_base64:base64}
+  const headers = {
+    ...(options.headers || {}),
+    "x-api-key": API_KEY = "140926" 
   };
 
-  const r = await fetch("/api/documentos", {
-    method:"POST",
-    headers: {"Content-Type":"application/json", "x-api-key": API_KEY},
-    body: JSON.stringify(payload)
-  });
-  const data = await r.json();
-  setStatus(JSON.stringify(data, null, 2), r.ok);
-  if(r.ok) carregarCargas();
+
+  let resposta;
+
+
+  try {
+
+    resposta =
+      await fetch(
+        url,
+        {
+          ...options,
+          headers
+        }
+      );
+
+  }
+  catch (erro) {
+
+    throw new Error(
+      "Não foi possível conectar à API."
+    );
+
+  }
+
+
+  const texto =
+    await resposta.text();
+
+
+  let dados = {};
+
+
+  if (texto) {
+
+    try {
+
+      dados =
+        JSON.parse(texto);
+
+    }
+    catch {
+
+      throw new Error(
+        `HTTP ${resposta.status}: resposta inválida da API.`
+      );
+
+    }
+
+  }
+
+
+  if (!resposta.ok) {
+
+    throw new Error(
+      `HTTP ${resposta.status}: ${
+        dados.erro ||
+        "Erro retornado pela API"
+      }`
+    );
+
+  }
+
+
+  return dados;
+
+}
+
+
+/* =========================================================
+   CARREGAR CARGAS
+   ========================================================= */
+
+async function carregarCargas() {
+
+  cargasEl.innerHTML = `
+    <tr>
+      <td colspan="4">
+        Carregando cargas...
+      </td>
+    </tr>
+  `;
+
+
+  try {
+
+    const dados =
+      await apiRequest(
+        "/api/cargas"
+      );
+
+
+    if (
+      !Array.isArray(
+        dados.cargas
+      )
+    ) {
+
+      throw new Error(
+        "A API não retornou uma lista válida de cargas."
+      );
+
+    }
+
+
+    if (
+      dados.cargas.length === 0
+    ) {
+
+      cargasEl.innerHTML = `
+        <tr>
+          <td colspan="4">
+            Nenhuma carga encontrada.
+          </td>
+        </tr>
+      `;
+
+
+      setStatus(
+        "API conectada, porém nenhuma carga foi encontrada.",
+        true
+      );
+
+
+      return;
+
+    }
+
+
+    cargasEl.innerHTML =
+      dados.cargas
+        .map(
+          carga => {
+
+            const id =
+              carga.id_carga ||
+              carga.id ||
+              "";
+
+            const cliente =
+              carga.cliente ||
+              "";
+
+            const nf =
+              carga.nf ||
+              "";
+
+            const status =
+              carga.status ||
+              "";
+
+
+            return `
+
+              <tr>
+
+                <td>
+                  ${id}
+                </td>
+
+                <td>
+                  ${cliente}
+                </td>
+
+                <td>
+                  ${nf}
+                </td>
+
+                <td>
+
+                  <span class="
+                    pill ${
+                      status === "EXPEDIDA"
+                        ? "pill-done"
+                        : "pill-open"
+                    }
+                  ">
+
+                    ${status}
+
+                  </span>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          }
+        )
+        .join("");
+
+
+    setStatus(
+      `API conectada com sucesso. ${dados.cargas.length} carga(s) carregada(s).`,
+      true
+    );
+
+  }
+  catch (erro) {
+
+    cargasEl.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="4"
+          style="
+            color:#b91c1c;
+            font-weight:700;
+          "
+        >
+          Erro ao carregar cargas
+        </td>
+
+      </tr>
+
+    `;
+
+
+    setStatus(
+      `ERRO DE INTEGRAÇÃO
+
+${erro.message}`
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CONSULTAR CARGA
+   ========================================================= */
+
+document
+  .getElementById("buscar")
+  .onclick =
+async () => {
+
+
+  const id =
+    document
+      .getElementById("carga")
+      .value
+      .trim();
+
+
+  if (!id) {
+
+    setStatus(
+      "Informe o ID da carga."
+    );
+
+    return;
+
+  }
+
+
+  setStatus(
+    `Consultando carga ${id}...`
+  );
+
+
+  try {
+
+    const dados =
+      await apiRequest(
+        `/api/cargas/${encodeURIComponent(id)}`
+      );
+
+
+    setStatus(
+`CARGA LOCALIZADA
+
+ID: ${dados.id_carga || dados.id || ""}
+Cliente: ${dados.cliente || ""}
+NF: ${dados.nf || ""}
+Status: ${dados.status || ""}`,
+      true
+    );
+
+  }
+  catch (erro) {
+
+    setStatus(
+`ERRO AO CONSULTAR CARGA
+
+${erro.message}`
+    );
+
+  }
+
 };
 
-document.getElementById("limpar").onclick = () => {
-  document.getElementById("cliente").value="";
-  document.getElementById("nf").value="";
-  document.getElementById("carga").value="";
-  arquivo.value="";
-  document.getElementById("arquivoInfo").textContent="Nenhum arquivo selecionado";
-  setStatus("Aguardando ação.");
+
+/* =========================================================
+   ENVIAR DOCUMENTO
+   ========================================================= */
+
+document
+  .getElementById("enviar")
+  .onclick =
+async () => {
+
+
+  const cliente =
+    document
+      .getElementById("cliente")
+      .value;
+
+
+  const nf =
+    document
+      .getElementById("nf")
+      .value
+      .trim();
+
+
+  const idCarga =
+    document
+      .getElementById("carga")
+      .value
+      .trim();
+
+
+  const file =
+    arquivo.files[0];
+
+
+  if (
+    !cliente ||
+    !nf ||
+    !idCarga ||
+    !file
+  ) {
+
+    setStatus(
+      "Preencha cliente, NF, ID da carga e anexe um documento."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    file.size >
+    20 * 1024 * 1024
+  ) {
+
+    setStatus(
+      "Arquivo acima do limite de 20 MB."
+    );
+
+    return;
+
+  }
+
+
+  const extensao =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+
+  const extensoesPermitidas = [
+    "pdf",
+    "xml",
+    "png",
+    "jpg",
+    "jpeg"
+  ];
+
+
+  if (
+    !extensoesPermitidas
+      .includes(extensao)
+  ) {
+
+    setStatus(
+      "Formato de arquivo não permitido."
+    );
+
+    return;
+
+  }
+
+
+  setStatus(
+    "Preparando documento..."
+  );
+
+
+  try {
+
+
+    const base64 =
+      await new Promise(
+        (
+          resolve,
+          reject
+        ) => {
+
+          const leitor =
+            new FileReader();
+
+
+          leitor.onload =
+            () => {
+
+              const resultado =
+                String(
+                  leitor.result
+                );
+
+
+              resolve(
+                resultado
+                  .split(",")[1]
+              );
+
+            };
+
+
+          leitor.onerror =
+            () => {
+
+              reject(
+                new Error(
+                  "Erro ao ler o arquivo."
+                )
+              );
+
+            };
+
+
+          leitor.readAsDataURL(
+            file
+          );
+
+        }
+      );
+
+
+    const payload = {
+
+      cliente:
+        cliente,
+
+      nf:
+        nf,
+
+      id_carga:
+        idCarga,
+
+      documento: {
+
+        nome:
+          file.name,
+
+        tipo:
+          file.type ||
+          extensao,
+
+        tamanho:
+          file.size,
+
+        conteudo_base64:
+          base64
+
+      }
+
+    };
+
+
+    setStatus(
+      "Enviando documento para a API..."
+    );
+
+
+    const dados =
+      await apiRequest(
+        "/api/documentos",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(
+              payload
+            )
+
+        }
+      );
+
+
+    const carga =
+      dados.carga ||
+      {};
+
+
+    setStatus(
+`INTEGRAÇÃO REALIZADA COM SUCESSO
+
+Documento enviado para o sistema.
+
+ID da carga: ${carga.id_carga || idCarga}
+Cliente: ${carga.cliente || cliente}
+NF: ${carga.nf || nf}
+Status: ${carga.status || "EXPEDIDA"}
+Documento: ${file.name}`,
+      true
+    );
+
+
+    await carregarCargas();
+
+
+  }
+  catch (erro) {
+
+
+    setStatus(
+`FALHA NA INTEGRAÇÃO
+
+${erro.message}`
+    );
+
+  }
+
 };
+
+
+/* =========================================================
+   LIMPAR
+   ========================================================= */
+
+document
+  .getElementById("limpar")
+  .onclick =
+() => {
+
+
+  document
+    .getElementById("cliente")
+    .value =
+      "";
+
+
+  document
+    .getElementById("nf")
+    .value =
+      "";
+
+
+  document
+    .getElementById("carga")
+    .value =
+      "";
+
+
+  arquivo.value =
+    "";
+
+
+  document
+    .getElementById(
+      "arquivoInfo"
+    )
+    .textContent =
+      "Nenhum arquivo selecionado";
+
+
+  setStatus(
+    "Aguardando ação."
+  );
+
+};
+
+
+/* =========================================================
+   INICIAR
+   ========================================================= */
 
 carregarCargas();
+
 </script>
+
 </body>
 </html>
+
+     
