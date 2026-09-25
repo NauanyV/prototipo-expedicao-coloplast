@@ -7,7 +7,7 @@ from psycopg.rows import dict_row
 from urllib.parse import urlparse
 
 API_KEY = os.environ.get("API_KEY")
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("NEON_DATABASE_URL")
 
 
 def send_json(handler, status, payload):
