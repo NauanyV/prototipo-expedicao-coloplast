@@ -848,6 +848,12 @@
           );
         }
 
+        if (documentWindow.closed) {
+          throw new Error(
+            "A aba do documento foi fechada antes de carregar."
+          );
+        }
+
         const documentBlob =
           base64ToBlob(
             base64Content,
@@ -859,8 +865,51 @@
             documentBlob
           );
 
-        documentWindow.location.href =
-          documentUrl;
+        /*
+          Alguns tipos de arquivo (XML, DOCX, XLSX, etc.) não são
+          exibidos diretamente pelo navegador: ao navegar a aba
+          para essa URL, o navegador inicia um download em segundo
+          plano e a aba NÃO muda de conteúdo, ficando presa em
+          "Carregando documento...". Por isso, para esses tipos,
+          escrevemos um link de download na própria aba (e clicamos
+          nele automaticamente) em vez de depender da navegação.
+        */
+        const canRenderInline =
+          mimeType.indexOf("image/") === 0 ||
+          mimeType === "application/pdf" ||
+          mimeType.indexOf("text/") === 0;
+
+        if (canRenderInline) {
+          documentWindow.location.href =
+            documentUrl;
+        } else {
+          const escapedFileName =
+            escapeHtml(fileName);
+
+          const escapedMimeType =
+            escapeHtml(mimeType);
+
+          documentWindow.document.body.innerHTML =
+            "<p>O arquivo <b>" +
+            escapedFileName +
+            "</b> (tipo: " +
+            escapedMimeType +
+            ") não pode ser exibido diretamente pelo navegador.</p>" +
+            "<p><a id='downloadLink' href='" +
+            documentUrl +
+            "' download='" +
+            escapedFileName +
+            "'>Clique aqui para baixar o documento</a></p>";
+
+          const downloadLink =
+            documentWindow.document.getElementById(
+              "downloadLink"
+            );
+
+          if (downloadLink) {
+            downloadLink.click();
+          }
+        }
 
         showStatus(
           "Documento aberto com sucesso: " +
@@ -878,7 +927,9 @@
         );
 
       } catch (error) {
-        documentWindow.close();
+        if (!documentWindow.closed) {
+          documentWindow.close();
+        }
 
         showStatus(
           "ERRO AO VISUALIZAR DOCUMENTO\n\n" +
