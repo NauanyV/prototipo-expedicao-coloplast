@@ -33,167 +33,172 @@ def send_json(request_handler, status_code, payload):
         "*"
     )
 
-    request_handle*.send_header(
-        "Access-Cont*ol-Allow-Headers",
-        "Conten*-Type, x-api-key"
+    request_handler.send_header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, x-api-key"
     )
 
-    reque*t_handler.send_header(
-        "Ac*ess-Control-Allow-Methods",
-      * "GET, POST, OPTIONS"
+    request_handler.send_header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS"
     )
 
-    r*quest_handler.send_header(
-       *"Cache-Control",
-        "no-store* no-cache, must-revalidate"
-    )
-*    request_handler.send_header(
- *      "Content-Length",
-        st*(len(response_content))
+    request_handler.send_header(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate"
     )
 
-   *request_handler.end_headers()
+    request_handler.send_header(
+        "Content-Length",
+        str(len(response_content))
+    )
 
-   *if status_code != 204:
-        req*est_handler.wfile.write(response_c*ntent)
+    request_handler.end_headers()
+
+    if status_code != 204:
+        request_handler.wfile.write(response_content)
 
 
-def get_database_connecti*n():
+def get_database_connection():
     if not DATABASE_URL:
-    *   raise RuntimeError(
-           *"NEON_DATABASE_URL nao configurada*no Vercel."
+        raise RuntimeError(
+            "NEON_DATABASE_URL nao configurada no Vercel."
         )
 
-    return *sycopg.connect(
-        DATABASE_U*L,
+    return psycopg.connect(
+        DATABASE_URL,
         row_factory=dict_row,
- *      connect_timeout=10
+        connect_timeout=10
     )
 
 
-d*f get_request_parameters(request_h*ndler):
-    parsed_url = urlparse(*equest_handler.path)
-    query_par*meters = parse_qs(parsed_url.query*
+def get_request_parameters(request_handler):
+    parsed_url = urlparse(request_handler.path)
+    query_parameters = parse_qs(parsed_url.query)
 
-    route = query_parameters.get*
+    route = query_parameters.get(
         "rota",
         [""]
-    *[0]
+    )[0]
 
-    load_id = query_parameter*.get(
+    load_id = query_parameters.get(
         "id",
         [""]
- *  )[0]
+    )[0]
 
-    return route.strip(), *oad_id.strip()
+    return route.strip(), load_id.strip()
 
 
-def decode_docume*t_base64(base64_content):
-    clea*_content = str(
-        base64_con*ent or ""
+def decode_document_base64(base64_content):
+    clean_content = str(
+        base64_content or ""
     ).strip()
 
-    if ",* in clean_content:
-        clean_c*ntent = clean_content.split(
-     *      ",",
+    if "," in clean_content:
+        clean_content = clean_content.split(
+            ",",
             1
-        )*1]
+        )[1]
 
     return base64.b64decode(
- *      clean_content,
-        valid*te=True
+        clean_content,
+        validate=True
     )
 
 
-class handler(Base*TTPRequestHandler):
+class handler(BaseHTTPRequestHandler):
 
-    def log_m*ssage(self, format_text, *args):
- *      return
+    def log_message(self, format_text, *args):
+        return
 
-    def do_OPTIONS(s*lf):
+    def do_OPTIONS(self):
         send_json(
-          * self,
+            self,
             204,
-          * {}
+            {}
         )
 
-    def is_authoriz*d(self):
-        received_key = se*f.headers.get(
-            "x-api-*ey"
+    def is_authorized(self):
+        received_key = self.headers.get(
+            "x-api-key"
         )
 
-        if not API_*EY:
+        if not API_KEY:
             return False
 
-    *   return received_key == API_KEY
-*    def require_authorization(self*:
-        if self.is_authorized():*            return True
+        return received_key == API_KEY
 
-        s*nd_json(
+    def require_authorization(self):
+        if self.is_authorized():
+            return True
+
+        send_json(
             self,
-       *    401,
+            401,
             {
-           *    "erro": "API key invalida."
-  *         }
+                "erro": "API key invalida."
+            }
         )
 
-        retu*n False
+        return False
 
     def do_GET(self):
-   *    if not self.require_authorizat*on():
+        if not self.require_authorization():
             return
 
-        *ry:
-            route, load_id = g*t_request_parameters(
-            *   self
+        try:
+            route, load_id = get_request_parameters(
+                self
             )
 
-           *if route == "":
-                se*f.get_api_information()
-          *     return
-
-            if route *= "cargas":
-                self.l*st_loads()
-                return
-*            if route == "carga":
- *              self.get_load(load_i*)
+            if route == "":
+                self.get_api_information()
                 return
 
-        *   if route == "documento":
-      *         self.get_document(load_id*
+            if route == "cargas":
+                self.list_loads()
                 return
 
-         *  send_json(
-                self,*                404,
-             *  {
-                    "erro": "R*ta nao encontrada.",
-             *      "rota": route
-              * }
-            )
+            if route == "carga":
+                self.get_load(load_id)
+                return
 
-        except E*ception as error:
-            prin*(
-                "GET ERROR:",
-  *             repr(error)
-         *  )
+            if route == "documento":
+                self.get_document(load_id)
+                return
 
             send_json(
-      *         self,
-                500*
+                self,
+                404,
                 {
-               *    "erro": "Erro interno da API."*
-                    "detalhe": st*(error)
+                    "erro": "Rota nao encontrada.",
+                    "rota": route
                 }
-        *   )
+            )
 
-    def get_api_information(*elf):
+        except Exception as error:
+            print(
+                "GET ERROR:",
+                repr(error)
+            )
+
+            send_json(
+                self,
+                500,
+                {
+                    "erro": "Erro interno da API.",
+                    "detalhe": str(error)
+                }
+            )
+
+    def get_api_information(self):
         send_json(
-         *  self,
+            self,
             200,
-         *  {
-                "api": "Protot*po Analytics Coloplast",
-         *      "status": "online",
-        *       "database": "Neon PostgreSQ*",
+            {
+                "api": "Prototipo Analytics Coloplast",
+                "status": "online",
+                "database": "Neon PostgreSQL",
                 "routes": [
                     "GET /api?rota=cargas",
                     "GET /api?rota=carga&id=141501",
@@ -203,168 +208,171 @@ class handler(Base*TTPRequestHandler):
             }
         )
 
-   *def list_loads(self):
-        try:*            with get_database_conn*ction() as connection:
-           *    with connection.cursor() as cu*sor:
-                    cursor.ex*cute(
+    def list_loads(self):
+        try:
+            with get_database_connection() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
                         """
-*                       SELECT
-    *                       id_carga,
- *                          cliente,*                            nf,
-  *                         status,
- *                          document*_nome,
-                           *documento_tipo,
-                  *         CASE
-                    *           WHEN documento_base64 I* NOT NULL
-                        *        AND documento_base64 != ''*                                TH*N TRUE
-                           *    ELSE FALSE
-                   *        END AS possui_documento,
- *                          data_atu*lizacao
-                        FR*M cargas
-                        O*DER BY id_carga
-                  *     """
+                        SELECT
+                            id_carga,
+                            cliente,
+                            nf,
+                            status,
+                            documento_nome,
+                            documento_tipo,
+                            CASE
+                                WHEN documento_base64 IS NOT NULL
+                                    AND documento_base64 != ''
+                                THEN TRUE
+                                ELSE FALSE
+                            END AS possui_documento,
+                            data_atualizacao
+                        FROM cargas
+                        ORDER BY id_carga
+                        """
                     )
 
-  *                 loads = cursor.fe*chall()
+                    loads = cursor.fetchall()
 
             send_json(
-  *             self,
-               *200,
-                {
-           *        "cargas": loads
-          *     }
-            )
-
-        exce*t Exception as error:
-            *rint(
-                "LIST LOADS *RROR:",
-                repr(error*
-            )
-
-            send_j*on(
                 self,
-        *       500,
+                200,
                 {
-    *               "erro": "Erro ao co*sultar o banco.",
-                *   "detalhe": str(error)
-         *      }
+                    "cargas": loads
+                }
             )
 
-    def get*load(self, load_id):
-        if no* load_id:
+        except Exception as error:
+            print(
+                "LIST LOADS ERROR:",
+                repr(error)
+            )
+
             send_json(
- *              self,
-              * 400,
+                self,
+                500,
                 {
-          *         "erro": "ID da carga nao *nformado."
+                    "erro": "Erro ao consultar o banco.",
+                    "detalhe": str(error)
                 }
-     *      )
+            )
+
+    def get_load(self, load_id):
+        if not load_id:
+            send_json(
+                self,
+                400,
+                {
+                    "erro": "ID da carga nao informado."
+                }
+            )
             return
 
-      * try:
-            with get_databas*_connection() as connection:
-     *          with connection.cursor()*as cursor:
-                    cur*or.execute(
-                      * """
-                        SELEC*
-                            id_ca*ga,
-                            cl*ente,
-                            *f,
-                            sta*us,
-                            do*umento_nome,
-                     *      documento_tipo,
-            *               CASE
-              *                 WHEN documento_ba*e64 IS NOT NULL
-                  *              AND documento_base64*!= ''
-                            *   THEN TRUE
-                     *          ELSE FALSE
-             *              END AS possui_docume*to,
-                            da*a_atualizacao
-                    *   FROM cargas
-                   *    WHERE id_carga = %s
-          *             """,
-                *       (load_id,)
-                *   )
+        try:
+            with get_database_connection() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT
+                            id_carga,
+                            cliente,
+                            nf,
+                            status,
+                            documento_nome,
+                            documento_tipo,
+                            CASE
+                                WHEN documento_base64 IS NOT NULL
+                                    AND documento_base64 != ''
+                                THEN TRUE
+                                ELSE FALSE
+                            END AS possui_documento,
+                            data_atualizacao
+                        FROM cargas
+                        WHERE id_carga = %s
+                        """,
+                        (load_id,)
+                    )
 
-                    load = c*rsor.fetchone()
+                    load = cursor.fetchone()
 
-            if no* load:
+            if not load:
                 send_json(
-*                   self,
-         *          404,
-                   *{
-                        "erro": *Carga nao encontrada.",
-          *             "id_carga": load_id
- *                  }
-              * )
+                    self,
+                    404,
+                    {
+                        "erro": "Carga nao encontrada.",
+                        "id_carga": load_id
+                    }
+                )
                 return
 
-       *    send_json(
-                sel*,
+            send_json(
+                self,
                 200,
-           *    load
+                load
             )
 
-        ex*ept Exception as error:
-          * print(
-                "GET LOAD *RROR:",
-                repr(error*
+        except Exception as error:
+            print(
+                "GET LOAD ERROR:",
+                repr(error)
             )
 
-            send_j*on(
+            send_json(
                 self,
-        *       500,
+                500,
                 {
-    *               "erro": "Erro ao co*sultar a carga.",
-                *   "detalhe": str(error)
-         *      }
-            )
-
-    def get*document(self, load_id):
-        i* not load_id:
-            send_jso*(
-                self,
-          *     400,
-                {
-      *             "erro": "ID da carga *ao informado."
+                    "erro": "Erro ao consultar a carga.",
+                    "detalhe": str(error)
                 }
- *          )
+            )
+
+    def get_document(self, load_id):
+        if not load_id:
+            send_json(
+                self,
+                400,
+                {
+                    "erro": "ID da carga nao informado."
+                }
+            )
             return
 
-  *     try:
-            with get_dat*base_connection() as connection:
- *              with connection.curs*r() as cursor:
-                   *cursor.execute(
-                  *     """
-                        S*LECT
-                            i*_carga,
-                          * documento_nome,
-                 *          documento_tipo,
-        *                   documento_base6*
-                        FROM carg*s
-                        WHERE id*carga = %s
-                       *""",
-                        (load*id,)
+        try:
+            with get_database_connection() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT
+                            id_carga,
+                            documento_nome,
+                            documento_tipo,
+                            documento_base64
+                        FROM cargas
+                        WHERE id_carga = %s
+                        """,
+                        (load_id,)
                     )
 
-      *             document = cursor.fet*hone()
+                    document = cursor.fetchone()
 
-            if not documen*:
+            if not document:
                 send_json(
-     *              self,
-              *     404,
+                    self,
+                    404,
                     {
-  *                     "erro": "Carg* nao encontrada.",
-               *        "id_carga": load_id
-      *             }
+                        "erro": "Carga nao encontrada.",
+                        "id_carga": load_id
+                    }
                 )
- *              return
+                return
 
-            *ocument_base64 = document[
+            document_base64 = document[
                 "documento_base64"
             ]
 
-            if not document*base64:
+            if not document_base64:
                 send_json(
                     self,
                     404,
@@ -390,9 +398,7 @@ class handler(Base*TTPRequestHandler):
                         document["documento_tipo"]
                         or "application/octet-stream"
                     ),
-                    "documento_base64": (
-                        document_base64
-                    )
+                    "documento_base64": document_base64
                 }
             )
 
