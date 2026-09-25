@@ -1,9 +1,10 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import base64
+import os
 from urllib.parse import urlparse
 
-API_KEY = "DEMO-COLOPLAST-2026"
+API_KEY = os.environ.get("API_KEY")
 
 CARGAS = {
     "141501": {
