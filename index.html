@@ -1,11 +1,10 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Novo documento | Protótipo Coloplast</title>
+  <title>Expedição Coloplast | Protótipo</title>
 
   <style>
     :root {
@@ -299,13 +298,11 @@
 </head>
 
 <body>
-
   <main class="container">
 
     <header class="header">
       <div>
         <h1>Novo documento</h1>
-
         <p class="subtitle">
           Protótipo para simular a integração de documentos da expedição.
         </p>
@@ -319,7 +316,6 @@
     <div class="grid">
 
       <section class="card">
-
         <h2>Preencha os dados e anexe o documento.</h2>
 
         <div class="field">
@@ -414,17 +410,15 @@
         <div id="status" class="status neutral">
           Inicializando integração...
         </div>
-
       </section>
 
       <aside class="card">
-
         <h2>Simulação do Analytics</h2>
 
         <div class="kpis">
           <div class="kpi">
             <small>Endpoint</small>
-            <strong>/api/service</strong>
+            <strong>/api</strong>
           </div>
 
           <div class="kpi">
@@ -459,42 +453,26 @@
           Ao receber o documento, a API valida cliente, NF e ID,
           salva a imagem e altera o status para <b>EXPEDIDA</b>.
         </p>
-
       </aside>
 
     </div>
-
   </main>
 
   <script>
     /*
       PREENCHA SOMENTE A LINHA ABAIXO.
-
-      Use a mesma API_KEY configurada no Vercel
-      e no cabeçalho x-api-key do Power Automate.
+      Use a mesma API_KEY do Vercel e do Power Automate.
     */
 
-    const API_KEY = "vd_140926";
+    const API_KEY = "COLE_SUA_CHAVE_AQUI";
+    const API_URL = "/api";
 
-    const API_URL = "/api/service";
-
-    const statusBox =
-      document.getElementById("status");
-
-    const loadsTable =
-      document.getElementById("loadsTable");
-
-    const fileInput =
-      document.getElementById("file");
-
-    const sendButton =
-      document.getElementById("sendButton");
-
-    const searchButton =
-      document.getElementById("searchButton");
-
-    const clearButton =
-      document.getElementById("clearButton");
+    const statusBox = document.getElementById("status");
+    const loadsTable = document.getElementById("loadsTable");
+    const fileInput = document.getElementById("file");
+    const sendButton = document.getElementById("sendButton");
+    const searchButton = document.getElementById("searchButton");
+    const clearButton = document.getElementById("clearButton");
 
 
     function showStatus(message, type = "neutral") {
@@ -518,8 +496,7 @@
 
 
     function escapeHtml(value) {
-      const element =
-        document.createElement("div");
+      const element = document.createElement("div");
 
       element.textContent =
         value == null
@@ -544,7 +521,6 @@
 
       try {
         response = await fetch(url, options);
-
       } catch (error) {
         throw new Error(
           "Falha ao conectar com a API: " +
@@ -552,16 +528,13 @@
         );
       }
 
-      const responseText =
-        await response.text();
+      const responseText = await response.text();
 
       let responseData = {};
 
       if (responseText) {
         try {
-          responseData =
-            JSON.parse(responseText);
-
+          responseData = JSON.parse(responseText);
         } catch (error) {
           throw new Error(
             "HTTP " +
@@ -668,7 +641,6 @@
                 '">' +
                 'Visualizar' +
               '</button>';
-
           } else {
             documentColumn =
               '<span class="no-document">' +
@@ -834,17 +806,16 @@
       );
 
       try {
-        const documentData =
-          await callApi(
-            API_URL +
-            "?rota=documento&id=" +
-            encodeURIComponent(loadId) +
-            "&v=" +
-            Date.now(),
-            {
-              method: "GET"
-            }
-          );
+        const documentData = await callApi(
+          API_URL +
+          "?rota=documento&id=" +
+          encodeURIComponent(loadId) +
+          "&v=" +
+          Date.now(),
+          {
+            method: "GET"
+          }
+        );
 
         const base64Content =
           documentData.documento_base64;
@@ -869,217 +840,70 @@
             mimeType
           );
 
+        const documentUrl =
+          URL.createObjectURL(
+            documentBlob
+          );
 
-        const documentUrl = URL.createObjectURL(documentBlob);
-
-        documentWindow.location.href = documentUrl;
-
-        documentWindow.document.title = fileName;
+        documentWindow.location.href =
+          documentUrl;
 
         showStatus(
-          "Documento carregado com sucesso: " + fileName,
+          "Documento aberto com sucesso: " +
+          fileName,
           "success"
         );
 
-        setTimeout(() => {
-          URL.revokeObjectURL(documentUrl);
-        }, 60000);
+        window.setTimeout(
+          function () {
+            URL.revokeObjectURL(
+              documentUrl
+            );
+          },
+          60000
+        );
 
       } catch (error) {
         documentWindow.close();
 
         showStatus(
-          "ERRO AO ABRIR DOCUMENTO\n\n" + error.message,
-          "error"
-        );
-      }
-    }
-
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          const result = String(reader.result || "");
-          const commaIndex = result.indexOf(",");
-
-          resolve(
-            commaIndex >= 0
-              ? result.substring(commaIndex + 1)
-              : result
-          );
-        };
-
-        reader.onerror = () => {
-          reject(
-            new Error("Não foi possível ler o arquivo selecionado.")
-          );
-        };
-
-        reader.readAsDataURL(file);
-      });
-    }
-
-
-    function resetForm() {
-      document.getElementById("client").value = "";
-      document.getElementById("invoice").value = "";
-      document.getElementById("loadId").value = "";
-      fileInput.value = "";
-
-      document.getElementById("fileInfo").textContent =
-        "Nenhum arquivo selecionado";
-
-      showStatus(
-        "Formulário limpo.",
-        "neutral"
-      );
-    }
-
-
-    fileInput.addEventListener("change", function () {
-      const file = fileInput.files[0];
-
-      if (!file) {
-        document.getElementById("fileInfo").textContent =
-          "Nenhum arquivo selecionado";
-        return;
-      }
-
-      const maximumSize = 20 * 1024 * 1024;
-
-      if (file.size > maximumSize) {
-        fileInput.value = "";
-
-        document.getElementById("fileInfo").textContent =
-          "Nenhum arquivo selecionado";
-
-        showStatus(
-          "O arquivo ultrapassa o limite de 20 MB.",
-          "error"
-        );
-
-        return;
-      }
-
-      document.getElementById("fileInfo").textContent =
-        file.name +
-        " • " +
-        (file.size / 1024 / 1024).toFixed(2) +
-        " MB";
-    });
-
-
-    sendButton.addEventListener("click", async function () {
-      const client =
-        document.getElementById("client").value.trim();
-
-      const invoice =
-        document.getElementById("invoice").value.trim();
-
-      const loadId =
-        document.getElementById("loadId").value.trim();
-
-      const file =
-        fileInput.files[0];
-
-      if (!client || !invoice || !loadId || !file) {
-        showStatus(
-          "Preencha Cliente, Número da NF, ID da carga e selecione um documento.",
-          "error"
-        );
-
-        return;
-      }
-
-      if (file.size > 20 * 1024 * 1024) {
-        showStatus(
-          "O arquivo ultrapassa o limite de 20 MB.",
-          "error"
-        );
-
-        return;
-      }
-
-      setButtonsDisabled(true);
-
-      showStatus(
-        "Lendo documento e preparando integração...",
-        "neutral"
-      );
-
-      try {
-        const base64Content =
-          await fileToBase64(file);
-
-        const payload = {
-          cliente: client,
-          nf: invoice,
-          id_carga: loadId,
-          documento: {
-            nome: file.name,
-            tipo: file.type || "application/octet-stream",
-            conteudo_base64: base64Content
-          }
-        };
-
-        showStatus(
-          "Enviando documento para a API...",
-          "neutral"
-        );
-
-        const result =
-          await callApi(
-            API_URL + "?rota=documentos",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(payload)
-            }
-          );
-
-        showStatus(
-          result.mensagem ||
-          "Documento integrado com sucesso.",
-          "success"
-        );
-
-        await loadAllLoads();
-
-      } catch (error) {
-        showStatus(
-          "ERRO AO ENVIAR DOCUMENTO\n\n" +
+          "ERRO AO VISUALIZAR DOCUMENTO\n\n" +
           error.message,
           "error"
         );
-
-      } finally {
-        setButtonsDisabled(false);
       }
-    });
+    }
 
 
-    searchButton.addEventListener("click", async function () {
-      const loadId =
-        document.getElementById("loadId").value.trim();
+    searchButton.addEventListener(
+      "click",
+      async function () {
+        const loadId =
+          document
+            .getElementById("loadId")
+            .value
+            .trim();
 
-      if (!loadId) {
+        if (!loadId) {
+          showStatus(
+            "Informe o ID da carga.",
+            "error"
+          );
+
+          return;
+        }
+
+        setButtonsDisabled(true);
+
         showStatus(
-          "Informe o ID da carga para consultar.",
-          "error"
+          "Consultando carga " +
+          loadId +
+          "...",
+          "neutral"
         );
 
-        return;
-      }
-
-      setButtonsDisabled(true);
-
-      try {
-        const result =
-          await callApi(
+        try {
+          const result = await callApi(
             API_URL +
             "?rota=carga&id=" +
             encodeURIComponent(loadId) +
@@ -1090,41 +914,306 @@
             }
           );
 
-        const load = result || {};
+          showStatus(
+            "CARGA LOCALIZADA\n\n" +
+            "ID: " +
+            (
+              result.id_carga ||
+              result.id ||
+              ""
+            ) +
+            "\nCliente: " +
+            (
+              result.cliente ||
+              ""
+            ) +
+            "\nNF: " +
+            (
+              result.nf ||
+              ""
+            ) +
+            "\nStatus: " +
+            (
+              result.status ||
+              ""
+            ) +
+            "\nDocumento: " +
+            (
+              result.possui_documento
+                ? "Disponível"
+                : "Não disponível"
+            ),
+            "success"
+          );
 
-        showStatus(
-          "Carga encontrada.\n\n" +
-          "ID: " + (load.id_carga || "") + "\n" +
-          "Cliente: " + (load.cliente || "") + "\n" +
-          "NF: " + (load.nf || "") + "\n" +
-          "Status: " + (load.status || "") + "\n" +
-          "Documento: " +
-          (
-            load.possui_documento
-              ? (load.documento_nome || "Sim")
-              : "Não"
-          ),
-          "success"
-        );
+        } catch (error) {
+          showStatus(
+            "ERRO AO CONSULTAR CARGA\n\n" +
+            error.message,
+            "error"
+          );
 
-      } catch (error) {
-        showStatus(
-          "ERRO AO CONSULTAR CARGA\n\n" +
-          error.message,
-          "error"
-        );
-
-      } finally {
-        setButtonsDisabled(false);
+        } finally {
+          setButtonsDisabled(false);
+        }
       }
-    });
+    );
+
+
+    fileInput.addEventListener(
+      "change",
+      function () {
+        const selectedFile =
+          fileInput.files[0];
+
+        const fileInfo =
+          document.getElementById(
+            "fileInfo"
+          );
+
+        if (!selectedFile) {
+          fileInfo.textContent =
+            "Nenhum arquivo selecionado";
+
+          return;
+        }
+
+        const sizeMb =
+          (
+            selectedFile.size /
+            1024 /
+            1024
+          ).toFixed(2);
+
+        fileInfo.textContent =
+          selectedFile.name +
+          " - " +
+          sizeMb +
+          " MB";
+      }
+    );
+
+
+    function convertFileToBase64(file) {
+      return new Promise(
+        function (resolve, reject) {
+          const reader =
+            new FileReader();
+
+          reader.onload =
+            function () {
+              const result =
+                String(reader.result);
+
+              const parts =
+                result.split(",");
+
+              if (parts.length < 2) {
+                reject(
+                  new Error(
+                    "Falha ao converter o arquivo."
+                  )
+                );
+
+                return;
+              }
+
+              resolve(parts[1]);
+            };
+
+          reader.onerror =
+            function () {
+              reject(
+                new Error(
+                  "Falha ao ler o arquivo."
+                )
+              );
+            };
+
+          reader.readAsDataURL(file);
+        }
+      );
+    }
+
+
+    sendButton.addEventListener(
+      "click",
+      async function () {
+        const client =
+          document
+            .getElementById("client")
+            .value;
+
+        const invoice =
+          document
+            .getElementById("invoice")
+            .value
+            .trim();
+
+        const loadId =
+          document
+            .getElementById("loadId")
+            .value
+            .trim();
+
+        const selectedFile =
+          fileInput.files[0];
+
+        if (
+          !client ||
+          !invoice ||
+          !loadId ||
+          !selectedFile
+        ) {
+          showStatus(
+            "Preencha cliente, NF, ID da carga e selecione um documento.",
+            "error"
+          );
+
+          return;
+        }
+
+        if (
+          selectedFile.size >
+          20 * 1024 * 1024
+        ) {
+          showStatus(
+            "O arquivo ultrapassa o limite de 20 MB.",
+            "error"
+          );
+
+          return;
+        }
+
+        setButtonsDisabled(true);
+
+        showStatus(
+          "Preparando documento...",
+          "neutral"
+        );
+
+        try {
+          const fileBase64 =
+            await convertFileToBase64(
+              selectedFile
+            );
+
+          const payload = {
+            cliente: client,
+            nf: invoice,
+            id_carga: loadId,
+            documento: {
+              nome: selectedFile.name,
+              tipo:
+                selectedFile.type ||
+                "application/octet-stream",
+              tamanho:
+                selectedFile.size,
+              conteudo_base64:
+                fileBase64
+            }
+          };
+
+          showStatus(
+            "Enviando documento para a API...",
+            "neutral"
+          );
+
+          const result = await callApi(
+            API_URL +
+            "?rota=documentos&v=" +
+            Date.now(),
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+              body:
+                JSON.stringify(payload)
+            }
+          );
+
+          const updatedLoad =
+            result.carga || {};
+
+          showStatus(
+            "INTEGRAÇÃO REALIZADA COM SUCESSO\n\n" +
+            "ID da carga: " +
+            (
+              updatedLoad.id_carga ||
+              loadId
+            ) +
+            "\nCliente: " +
+            (
+              updatedLoad.cliente ||
+              client
+            ) +
+            "\nNF: " +
+            (
+              updatedLoad.nf ||
+              invoice
+            ) +
+            "\nStatus: " +
+            (
+              updatedLoad.status ||
+              "EXPEDIDA"
+            ) +
+            "\nDocumento: " +
+            selectedFile.name,
+            "success"
+          );
+
+          await loadAllLoads();
+
+        } catch (error) {
+          showStatus(
+            "FALHA NA INTEGRAÇÃO\n\n" +
+            error.message,
+            "error"
+          );
+
+        } finally {
+          setButtonsDisabled(false);
+        }
+      }
+    );
 
 
     clearButton.addEventListener(
       "click",
-      resetForm
+      function () {
+        document
+          .getElementById("client")
+          .value = "";
+
+        document
+          .getElementById("invoice")
+          .value = "";
+
+        document
+          .getElementById("loadId")
+          .value = "";
+
+        fileInput.value = "";
+
+        document
+          .getElementById("fileInfo")
+          .textContent =
+            "Nenhum arquivo selecionado";
+
+        showStatus(
+          "Aguardando ação.",
+          "neutral"
+        );
+      }
     );
 
+
+    showStatus(
+      "JavaScript carregado. Conectando com a API...",
+      "neutral"
+    );
 
     loadAllLoads();
   </script>
