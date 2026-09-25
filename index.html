@@ -40,8 +40,8 @@
 
     .header {
       display: flex;
-      justify-content: space-between;
       align-items: flex-start;
+      justify-content: space-between;
       gap: 20px;
       margin-bottom: 20px;
     }
@@ -76,7 +76,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      box-shadow: 0 2px 12px rgba(31, 41, 55, .04);
+      box-shadow: 0 2px 12px rgba(31, 41, 55, 0.04);
     }
 
     .card h2 {
@@ -105,7 +105,7 @@
       padding: 12px;
       border: 1px solid var(--border);
       border-radius: 9px;
-      background: white;
+      background: #ffffff;
       font: inherit;
       outline: none;
     }
@@ -113,7 +113,7 @@
     input:focus,
     select:focus {
       border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(36, 87, 214, .1);
+      box-shadow: 0 0 0 3px rgba(36, 87, 214, 0.1);
     }
 
     .hint {
@@ -154,13 +154,13 @@
     }
 
     button:disabled {
-      opacity: .6;
+      opacity: 0.6;
       cursor: wait;
     }
 
     .primary {
       background: var(--blue);
-      color: white;
+      color: #ffffff;
     }
 
     .primary:hover {
@@ -195,6 +195,7 @@
       padding: 14px;
       border-radius: 10px;
       font-size: 13px;
+      line-height: 1.5;
       white-space: pre-wrap;
     }
 
@@ -244,7 +245,7 @@
 
     table {
       width: 100%;
-      min-width: 600px;
+      min-width: 620px;
       border-collapse: collapse;
       font-size: 12px;
     }
@@ -302,7 +303,6 @@
   <main class="container">
 
     <header class="header">
-
       <div>
         <h1>Novo documento</h1>
 
@@ -314,19 +314,15 @@
       <div class="badge">
         MOCK API • DEMONSTRAÇÃO
       </div>
-
     </header>
 
     <div class="grid">
 
       <section class="card">
 
-        <h2>
-          Preencha os dados e anexe o documento.
-        </h2>
+        <h2>Preencha os dados e anexe o documento.</h2>
 
         <div class="field">
-
           <label for="client">
             Cliente <span class="required">*</span>
           </label>
@@ -337,11 +333,9 @@
             <option value="Voge">Voge</option>
             <option value="Outro">Outro</option>
           </select>
-
         </div>
 
         <div class="field">
-
           <label for="invoice">
             Número da NF <span class="required">*</span>
           </label>
@@ -351,11 +345,9 @@
             type="text"
             placeholder="Ex.: 21007"
           >
-
         </div>
 
         <div class="field">
-
           <label for="loadId">
             ID da carga <span class="required">*</span>
           </label>
@@ -369,17 +361,14 @@
           <div class="hint">
             Identificador usado para localizar a carga.
           </div>
-
         </div>
 
         <div class="field">
-
           <label for="file">
             Documento <span class="required">*</span>
           </label>
 
           <div class="upload">
-
             <input
               id="file"
               type="file"
@@ -393,13 +382,10 @@
             <div id="fileInfo" class="file-info">
               Nenhum arquivo selecionado
             </div>
-
           </div>
-
         </div>
 
         <div class="buttons">
-
           <button
             id="sendButton"
             class="primary"
@@ -423,7 +409,6 @@
           >
             Limpar
           </button>
-
         </div>
 
         <div id="status" class="status neutral">
@@ -434,12 +419,9 @@
 
       <aside class="card">
 
-        <h2>
-          Simulação do Analytics
-        </h2>
+        <h2>Simulação do Analytics</h2>
 
         <div class="kpis">
-
           <div class="kpi">
             <small>Endpoint</small>
             <strong>/api</strong>
@@ -449,13 +431,10 @@
             <small>Autenticação</small>
             <strong>x-api-key</strong>
           </div>
-
         </div>
 
         <div class="table-wrapper">
-
           <table>
-
             <thead>
               <tr>
                 <th>ID</th>
@@ -467,17 +446,13 @@
             </thead>
 
             <tbody id="loadsTable">
-
               <tr>
                 <td colspan="5">
                   Carregando cargas...
                 </td>
               </tr>
-
             </tbody>
-
           </table>
-
         </div>
 
         <p class="hint">
@@ -493,35 +468,34 @@
 
   <script>
     /*
-      PREENCHA SOMENTE ESTA LINHA.
+      PREENCHA SOMENTE A LINHA ABAIXO.
 
-      Coloque entre as aspas a mesma API_KEY configurada
-      no Vercel e usada no Power Automate.
+      Use a mesma API_KEY configurada no Vercel
+      e no cabeçalho x-api-key do Power Automate.
     */
 
-    let API_KEY = "vd_140926";
+    const API_KEY = "vd_140926";
 
-
-    let statusBox =
+    const statusBox =
       document.getElementById("status");
 
-    let loadsTable =
+    const loadsTable =
       document.getElementById("loadsTable");
 
-    let fileInput =
+    const fileInput =
       document.getElementById("file");
 
-    let sendButton =
+    const sendButton =
       document.getElementById("sendButton");
 
-    let searchButton =
+    const searchButton =
       document.getElementById("searchButton");
 
-    let clearButton =
+    const clearButton =
       document.getElementById("clearButton");
 
 
-    function showStatus(message, type) {
+    function showStatus(message, type = "neutral") {
       statusBox.textContent = message;
 
       statusBox.classList.remove(
@@ -530,9 +504,7 @@
         "error"
       );
 
-      statusBox.classList.add(
-        type || "neutral"
-      );
+      statusBox.classList.add(type);
     }
 
 
@@ -544,7 +516,7 @@
 
 
     function escapeHtml(value) {
-      let element =
+      const element =
         document.createElement("div");
 
       element.textContent =
@@ -556,40 +528,25 @@
     }
 
 
-    async function callApi(url, configuration) {
-      let options = configuration || {};
-      let headers = {};
+    async function callApi(url, configuration = {}) {
+      const originalHeaders =
+        configuration.headers || {};
 
-      if (options.headers) {
-        let headerNames =
-          Object.keys(options.headers);
+      const headers = {
+        ...originalHeaders,
+        "x-api-key": API_KEY
+      };
 
-        for (
-          let index = 0;
-          index < headerNames.length;
-          index++
-        ) {
-          let headerName =
-            headerNames[index];
-
-          headers[headerName] =
-            options.headers[headerName];
-        }
-      }
-
-      headers["x-api-key"] = API_KEY;
-
-      options.headers = headers;
-      options.cache = "no-store";
+      const options = {
+        ...configuration,
+        headers: headers,
+        cache: "no-store"
+      };
 
       let response;
 
       try {
-        response = await fetch(
-          url,
-          options
-        );
-
+        response = await fetch(url, options);
       } catch (error) {
         throw new Error(
           "Falha ao conectar com a API: " +
@@ -597,7 +554,7 @@
         );
       }
 
-      let responseText =
+      const responseText =
         await response.text();
 
       let responseData = {};
@@ -606,7 +563,6 @@
         try {
           responseData =
             JSON.parse(responseText);
-
         } catch (error) {
           throw new Error(
             "HTTP " +
@@ -635,10 +591,8 @@
     async function loadAllLoads() {
       loadsTable.innerHTML =
         '<tr>' +
-          '<td colspan="5">' +
-            "Carregando cargas..." +
-          "</td>" +
-        "</tr>";
+          '<td colspan="5">Carregando cargas...</td>' +
+        '</tr>';
 
       showStatus(
         "Conectando com a API...",
@@ -646,14 +600,13 @@
       );
 
       try {
-        let result =
-          await callApi(
-            "/api?rota=cargas&v=" +
-            Date.now(),
-            {
-              method: "GET"
-            }
-          );
+        const result = await callApi(
+          "/api?rota=cargas&v=" +
+          Date.now(),
+          {
+            method: "GET"
+          }
+        );
 
         if (!Array.isArray(result.cargas)) {
           throw new Error(
@@ -664,10 +617,8 @@
         if (result.cargas.length === 0) {
           loadsTable.innerHTML =
             '<tr>' +
-              '<td colspan="5">' +
-                "Nenhuma carga encontrada." +
-              "</td>" +
-            "</tr>";
+              '<td colspan="5">Nenhuma carga encontrada.</td>' +
+            '</tr>';
 
           showStatus(
             "API conectada, mas nenhuma carga foi encontrada.",
@@ -679,35 +630,28 @@
 
         let rows = "";
 
-        for (
-          let index = 0;
-          index < result.cargas.length;
-          index++
-        ) {
-          let load =
-            result.cargas[index];
-
-          let id =
+        for (const load of result.cargas) {
+          const id =
             load.id_carga ||
             load.id ||
             "";
 
-          let client =
+          const client =
             load.cliente ||
             "";
 
-          let invoice =
+          const invoice =
             load.nf ||
             "";
 
-          let loadStatus =
+          const loadStatus =
             load.status ||
             "";
 
-          let hasDocument =
+          const hasDocument =
             load.possui_documento === true;
 
-          let statusClass =
+          const statusClass =
             loadStatus === "EXPEDIDA"
               ? "done"
               : "open";
@@ -722,37 +666,37 @@
                 'data-load-id="' +
                 escapeHtml(id) +
                 '">' +
-                "Visualizar" +
-              "</button>";
+                'Visualizar' +
+              '</button>';
           } else {
             documentColumn =
               '<span class="no-document">' +
-                "Sem documento" +
-              "</span>";
+                'Sem documento' +
+              '</span>';
           }
 
           rows +=
-            "<tr>" +
-              "<td>" +
+            '<tr>' +
+              '<td>' +
                 escapeHtml(id) +
-              "</td>" +
-              "<td>" +
+              '</td>' +
+              '<td>' +
                 escapeHtml(client) +
-              "</td>" +
-              "<td>" +
+              '</td>' +
+              '<td>' +
                 escapeHtml(invoice) +
-              "</td>" +
-              "<td>" +
+              '</td>' +
+              '<td>' +
                 '<span class="pill ' +
                   statusClass +
                 '">' +
                   escapeHtml(loadStatus) +
-                "</span>" +
-              "</td>" +
-              "<td>" +
+                '</span>' +
+              '</td>' +
+              '<td>' +
                 documentColumn +
-              "</td>" +
-            "</tr>";
+              '</td>' +
+            '</tr>';
         }
 
         loadsTable.innerHTML = rows;
@@ -767,10 +711,11 @@
       } catch (error) {
         loadsTable.innerHTML =
           '<tr>' +
-            '<td colspan="5" style="color:#b91c1c;font-weight:700;">' +
-              "Erro ao carregar cargas" +
-            "</td>" +
-          "</tr>";
+            '<td colspan="5" ' +
+              'style="color:#b91c1c;font-weight:700;">' +
+              'Erro ao carregar cargas' +
+            '</td>' +
+          '</tr>';
 
         showStatus(
           "ERRO DE INTEGRAÇÃO\n\n" +
@@ -784,7 +729,7 @@
     loadsTable.addEventListener(
       "click",
       function (event) {
-        let button =
+        const button =
           event.target.closest(
             ".document-button"
           );
@@ -793,7 +738,7 @@
           return;
         }
 
-        let loadId =
+        const loadId =
           button.getAttribute(
             "data-load-id"
           );
@@ -807,13 +752,11 @@
       base64Content,
       mimeType
     ) {
-      let binaryContent =
+      const binaryContent =
         atob(base64Content);
 
-      let byteNumbers =
-        new Array(
-          binaryContent.length
-        );
+      const byteNumbers =
+        new Array(binaryContent.length);
 
       for (
         let index = 0;
@@ -824,7 +767,7 @@
           binaryContent.charCodeAt(index);
       }
 
-      let byteArray =
+      const byteArray =
         new Uint8Array(byteNumbers);
 
       return new Blob(
@@ -848,12 +791,7 @@
         return;
       }
 
-      /*
-        Abre a aba antes do await para evitar bloqueio
-        de pop-up pelo navegador.
-      */
-
-      let documentWindow =
+      const documentWindow =
         window.open(
           "",
           "_blank"
@@ -861,7 +799,8 @@
 
       if (!documentWindow) {
         showStatus(
-          "O navegador bloqueou a abertura do documento. Permita pop-ups para este site.",
+          "O navegador bloqueou a abertura do documento. " +
+          "Permita pop-ups para este site.",
           "error"
         );
 
@@ -870,12 +809,16 @@
 
       documentWindow.document.write(
         "<!doctype html>" +
-        "<html>" +
+        "<html lang='pt-BR'>" +
         "<head>" +
-        "<title>Carregando documento</title>" +
+          "<meta charset='utf-8'>" +
+          "<title>Carregando documento</title>" +
         "</head>" +
-        "<body style='font-family:Segoe UI,Arial,sans-serif;padding:30px;'>" +
-        "<p>Carregando documento...</p>" +
+        "<body style='" +
+          "font-family:Segoe UI,Arial,sans-serif;" +
+          "padding:30px;" +
+        "'>" +
+          "<p>Carregando documento...</p>" +
         "</body>" +
         "</html>"
       );
@@ -890,7 +833,7 @@
       );
 
       try {
-        let documentData =
+        const documentData =
           await callApi(
             "/api?rota=documento&id=" +
             encodeURIComponent(loadId) +
@@ -901,14 +844,14 @@
             }
           );
 
-        let base64Content =
+        const base64Content =
           documentData.documento_base64;
 
-        let mimeType =
+        const mimeType =
           documentData.documento_tipo ||
           "application/octet-stream";
 
-        let fileName =
+        const fileName =
           documentData.documento_nome ||
           "documento";
 
@@ -918,35 +861,28 @@
           );
         }
 
-        let documentBlob =
+        const documentBlob =
           base64ToBlob(
             base64Content,
             mimeType
           );
 
-        let documentUrl =
+        const documentUrl =
           URL.createObjectURL(
             documentBlob
           );
-
-        documentWindow.document.title =
-          fileName;
 
         documentWindow.location.href =
           documentUrl;
 
         showStatus(
-          "Documento aberto com sucesso.",
+          "Documento aberto com sucesso: " +
+          fileName,
           "success"
         );
 
         window.setTimeout(
           function () {
-            /*
-              Mantém a URL tempo suficiente para o navegador
-              carregar o arquivo antes de liberar a memória.
-            */
-
             URL.revokeObjectURL(
               documentUrl
             );
@@ -966,96 +902,98 @@
     }
 
 
-    searchButton.onclick =
-    async function () {
-      let loadId =
-        document
-          .getElementById("loadId")
-          .value
-          .trim();
+    searchButton.addEventListener(
+      "click",
+      async function () {
+        const loadId =
+          document
+            .getElementById("loadId")
+            .value
+            .trim();
 
-      if (!loadId) {
-        showStatus(
-          "Informe o ID da carga.",
-          "error"
-        );
-
-        return;
-      }
-
-      setButtonsDisabled(true);
-
-      showStatus(
-        "Consultando carga " +
-        loadId +
-        "...",
-        "neutral"
-      );
-
-      try {
-        let result =
-          await callApi(
-            "/api?rota=carga&id=" +
-            encodeURIComponent(loadId) +
-            "&v=" +
-            Date.now(),
-            {
-              method: "GET"
-            }
+        if (!loadId) {
+          showStatus(
+            "Informe o ID da carga.",
+            "error"
           );
 
+          return;
+        }
+
+        setButtonsDisabled(true);
+
         showStatus(
-          "CARGA LOCALIZADA\n\n" +
-          "ID: " +
-          (
-            result.id_carga ||
-            result.id ||
-            ""
-          ) +
-          "\nCliente: " +
-          (
-            result.cliente ||
-            ""
-          ) +
-          "\nNF: " +
-          (
-            result.nf ||
-            ""
-          ) +
-          "\nStatus: " +
-          (
-            result.status ||
-            ""
-          ) +
-          "\nDocumento: " +
-          (
-            result.possui_documento
-              ? "Disponível"
-              : "Não disponível"
-          ),
-          "success"
+          "Consultando carga " +
+          loadId +
+          "...",
+          "neutral"
         );
 
-      } catch (error) {
-        showStatus(
-          "ERRO AO CONSULTAR CARGA\n\n" +
-          error.message,
-          "error"
-        );
+        try {
+          const result =
+            await callApi(
+              "/api?rota=carga&id=" +
+              encodeURIComponent(loadId) +
+              "&v=" +
+              Date.now(),
+              {
+                method: "GET"
+              }
+            );
 
-      } finally {
-        setButtonsDisabled(false);
+          showStatus(
+            "CARGA LOCALIZADA\n\n" +
+            "ID: " +
+            (
+              result.id_carga ||
+              result.id ||
+              ""
+            ) +
+            "\nCliente: " +
+            (
+              result.cliente ||
+              ""
+            ) +
+            "\nNF: " +
+            (
+              result.nf ||
+              ""
+            ) +
+            "\nStatus: " +
+            (
+              result.status ||
+              ""
+            ) +
+            "\nDocumento: " +
+            (
+              result.possui_documento
+                ? "Disponível"
+                : "Não disponível"
+            ),
+            "success"
+          );
+
+        } catch (error) {
+          showStatus(
+            "ERRO AO CONSULTAR CARGA\n\n" +
+            error.message,
+            "error"
+          );
+
+        } finally {
+          setButtonsDisabled(false);
+        }
       }
-    };
+    );
 
 
     fileInput.addEventListener(
       "change",
       function () {
-        let selectedFile =
+        const selectedFile =
           fileInput.files[0];
 
-        let fileInfo =
+        const fileInfo =
           document.getElementById(
             "fileInfo"
           );
@@ -1067,7 +1005,7 @@
           return;
         }
 
-        let sizeMb =
+        const sizeMb =
           (
             selectedFile.size /
             1024 /
@@ -1086,21 +1024,21 @@
     function convertFileToBase64(file) {
       return new Promise(
         function (resolve, reject) {
-          let reader =
+          const reader =
             new FileReader();
 
           reader.onload =
             function () {
-              let result =
+              const result =
                 String(reader.result);
 
-              let parts =
+              const parts =
                 result.split(",");
 
               if (parts.length < 2) {
                 reject(
                   new Error(
-                    "Falha ao converter arquivo."
+                    "Falha ao converter o arquivo."
                   )
                 );
 
@@ -1114,7 +1052,7 @@
             function () {
               reject(
                 new Error(
-                  "Falha ao ler arquivo."
+                  "Falha ao ler o arquivo."
                 )
               );
             };
@@ -1125,174 +1063,178 @@
     }
 
 
-    sendButton.onclick =
-    async function () {
-      let client =
-        document
-          .getElementById("client")
-          .value;
+    sendButton.addEventListener(
+      "click",
+      async function () {
+        const client =
+          document
+            .getElementById("client")
+            .value;
 
-      let invoice =
-        document
-          .getElementById("invoice")
-          .value
-          .trim();
+        const invoice =
+          document
+            .getElementById("invoice")
+            .value
+            .trim();
 
-      let loadId =
-        document
-          .getElementById("loadId")
-          .value
-          .trim();
+        const loadId =
+          document
+            .getElementById("loadId")
+            .value
+            .trim();
 
-      let selectedFile =
-        fileInput.files[0];
+        const selectedFile =
+          fileInput.files[0];
 
-      if (
-        !client ||
-        !invoice ||
-        !loadId ||
-        !selectedFile
-      ) {
-        showStatus(
-          "Preencha cliente, NF, ID da carga e selecione um documento.",
-          "error"
-        );
-
-        return;
-      }
-
-      if (
-        selectedFile.size >
-        20 * 1024 * 1024
-      ) {
-        showStatus(
-          "O arquivo ultrapassa o limite de 20 MB.",
-          "error"
-        );
-
-        return;
-      }
-
-      setButtonsDisabled(true);
-
-      showStatus(
-        "Preparando documento...",
-        "neutral"
-      );
-
-      try {
-        let fileBase64 =
-          await convertFileToBase64(
-            selectedFile
+        if (
+          !client ||
+          !invoice ||
+          !loadId ||
+          !selectedFile
+        ) {
+          showStatus(
+            "Preencha cliente, NF, ID da carga e selecione um documento.",
+            "error"
           );
 
-        let payload = {
-          cliente: client,
-          nf: invoice,
-          id_carga: loadId,
-          documento: {
-            nome: selectedFile.name,
-            tipo:
-              selectedFile.type ||
-              "application/octet-stream",
-            tamanho:
-              selectedFile.size,
-            conteudo_base64:
-              fileBase64
-          }
-        };
+          return;
+        }
+
+        if (
+          selectedFile.size >
+          20 * 1024 * 1024
+        ) {
+          showStatus(
+            "O arquivo ultrapassa o limite de 20 MB.",
+            "error"
+          );
+
+          return;
+        }
+
+        setButtonsDisabled(true);
 
         showStatus(
-          "Enviando documento para a API...",
+          "Preparando documento...",
           "neutral"
         );
 
-        let result =
-          await callApi(
-            "/api?rota=documentos&v=" +
-            Date.now(),
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-              body:
-                JSON.stringify(payload)
+        try {
+          const fileBase64 =
+            await convertFileToBase64(
+              selectedFile
+            );
+
+          const payload = {
+            cliente: client,
+            nf: invoice,
+            id_carga: loadId,
+            documento: {
+              nome: selectedFile.name,
+              tipo:
+                selectedFile.type ||
+                "application/octet-stream",
+              tamanho:
+                selectedFile.size,
+              conteudo_base64:
+                fileBase64
             }
+          };
+
+          showStatus(
+            "Enviando documento para a API...",
+            "neutral"
           );
 
-        let updatedLoad =
-          result.carga || {};
+          const result =
+            await callApi(
+              "/api?rota=documentos&v=" +
+              Date.now(),
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+                body:
+                  JSON.stringify(payload)
+              }
+            );
 
-        showStatus(
-          "INTEGRAÇÃO REALIZADA COM SUCESSO\n\n" +
-          "ID da carga: " +
-          (
-            updatedLoad.id_carga ||
-            loadId
-          ) +
-          "\nCliente: " +
-          (
-            updatedLoad.cliente ||
-            client
-          ) +
-          "\nNF: " +
-          (
-            updatedLoad.nf ||
-            invoice
-          ) +
-          "\nStatus: " +
-          (
-            updatedLoad.status ||
-            "EXPEDIDA"
-          ) +
-          "\nDocumento: " +
-          selectedFile.name,
-          "success"
-        );
+          const updatedLoad =
+            result.carga || {};
 
-        await loadAllLoads();
+          showStatus(
+            "INTEGRAÇÃO REALIZADA COM SUCESSO\n\n" +
+            "ID da carga: " +
+            (
+              updatedLoad.id_carga ||
+              loadId
+            ) +
+            "\nCliente: " +
+            (
+              updatedLoad.cliente ||
+              client
+            ) +
+            "\nNF: " +
+            (
+              updatedLoad.nf ||
+              invoice
+            ) +
+            "\nStatus: " +
+            (
+              updatedLoad.status ||
+              "EXPEDIDA"
+            ) +
+            "\nDocumento: " +
+            selectedFile.name,
+            "success"
+          );
 
-      } catch (error) {
-        showStatus(
-          "FALHA NA INTEGRAÇÃO\n\n" +
-          error.message,
-          "error"
-        );
+          await loadAllLoads();
 
-      } finally {
-        setButtonsDisabled(false);
+        } catch (error) {
+          showStatus(
+            "FALHA NA INTEGRAÇÃO\n\n" +
+            error.message,
+            "error"
+          );
+
+        } finally {
+          setButtonsDisabled(false);
+        }
       }
-    };
+    );
 
 
-    clearButton.onclick =
-    function () {
-      document
-        .getElementById("client")
-        .value = "";
+    clearButton.addEventListener(
+      "click",
+      function () {
+        document
+          .getElementById("client")
+          .value = "";
 
-      document
-        .getElementById("invoice")
-        .value = "";
+        document
+          .getElementById("invoice")
+          .value = "";
 
-      document
-        .getElementById("loadId")
-        .value = "";
+        document
+          .getElementById("loadId")
+          .value = "";
 
-      fileInput.value = "";
+        fileInput.value = "";
 
-      document
-        .getElementById("fileInfo")
-        .textContent =
-          "Nenhum arquivo selecionado";
+        document
+          .getElementById("fileInfo")
+          .textContent =
+            "Nenhum arquivo selecionado";
 
-      showStatus(
-        "Aguardando ação.",
-        "neutral"
-      );
-    };
+        showStatus(
+          "Aguardando ação.",
+          "neutral"
+        );
+      }
+    );
 
 
     loadAllLoads();
