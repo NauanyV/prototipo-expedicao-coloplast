@@ -869,5 +869,265 @@
             mimeType
           );
 
-        const documentUrl =
-     
+
+        const documentUrl = URL.createObjectURL(documentBlob);
+
+        documentWindow.location.href = documentUrl;
+
+        documentWindow.document.title = fileName;
+
+        showStatus(
+          "Documento carregado com sucesso: " + fileName,
+          "success"
+        );
+
+        setTimeout(() => {
+          URL.revokeObjectURL(documentUrl);
+        }, 60000);
+
+      } catch (error) {
+        documentWindow.close();
+
+        showStatus(
+          "ERRO AO ABRIR DOCUMENTO\n\n" + error.message,
+          "error"
+        );
+      }
+    }
+
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const commaIndex = result.indexOf(",");
+
+          resolve(
+            commaIndex >= 0
+              ? result.substring(commaIndex + 1)
+              : result
+          );
+        };
+
+        reader.onerror = () => {
+          reject(
+            new Error("Não foi possível ler o arquivo selecionado.")
+          );
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+
+    function resetForm() {
+      document.getElementById("client").value = "";
+      document.getElementById("invoice").value = "";
+      document.getElementById("loadId").value = "";
+      fileInput.value = "";
+
+      document.getElementById("fileInfo").textContent =
+        "Nenhum arquivo selecionado";
+
+      showStatus(
+        "Formulário limpo.",
+        "neutral"
+      );
+    }
+
+
+    fileInput.addEventListener("change", function () {
+      const file = fileInput.files[0];
+
+      if (!file) {
+        document.getElementById("fileInfo").textContent =
+          "Nenhum arquivo selecionado";
+        return;
+      }
+
+      const maximumSize = 20 * 1024 * 1024;
+
+      if (file.size > maximumSize) {
+        fileInput.value = "";
+
+        document.getElementById("fileInfo").textContent =
+          "Nenhum arquivo selecionado";
+
+        showStatus(
+          "O arquivo ultrapassa o limite de 20 MB.",
+          "error"
+        );
+
+        return;
+      }
+
+      document.getElementById("fileInfo").textContent =
+        file.name +
+        " • " +
+        (file.size / 1024 / 1024).toFixed(2) +
+        " MB";
+    });
+
+
+    sendButton.addEventListener("click", async function () {
+      const client =
+        document.getElementById("client").value.trim();
+
+      const invoice =
+        document.getElementById("invoice").value.trim();
+
+      const loadId =
+        document.getElementById("loadId").value.trim();
+
+      const file =
+        fileInput.files[0];
+
+      if (!client || !invoice || !loadId || !file) {
+        showStatus(
+          "Preencha Cliente, Número da NF, ID da carga e selecione um documento.",
+          "error"
+        );
+
+        return;
+      }
+
+      if (file.size > 20 * 1024 * 1024) {
+        showStatus(
+          "O arquivo ultrapassa o limite de 20 MB.",
+          "error"
+        );
+
+        return;
+      }
+
+      setButtonsDisabled(true);
+
+      showStatus(
+        "Lendo documento e preparando integração...",
+        "neutral"
+      );
+
+      try {
+        const base64Content =
+          await fileToBase64(file);
+
+        const payload = {
+          cliente: client,
+          nf: invoice,
+          id_carga: loadId,
+          documento: {
+            nome: file.name,
+            tipo: file.type || "application/octet-stream",
+            conteudo_base64: base64Content
+          }
+        };
+
+        showStatus(
+          "Enviando documento para a API...",
+          "neutral"
+        );
+
+        const result =
+          await callApi(
+            API_URL + "?rota=documentos",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            }
+          );
+
+        showStatus(
+          result.mensagem ||
+          "Documento integrado com sucesso.",
+          "success"
+        );
+
+        await loadAllLoads();
+
+      } catch (error) {
+        showStatus(
+          "ERRO AO ENVIAR DOCUMENTO\n\n" +
+          error.message,
+          "error"
+        );
+
+      } finally {
+        setButtonsDisabled(false);
+      }
+    });
+
+
+    searchButton.addEventListener("click", async function () {
+      const loadId =
+        document.getElementById("loadId").value.trim();
+
+      if (!loadId) {
+        showStatus(
+          "Informe o ID da carga para consultar.",
+          "error"
+        );
+
+        return;
+      }
+
+      setButtonsDisabled(true);
+
+      try {
+        const result =
+          await callApi(
+            API_URL +
+            "?rota=carga&id=" +
+            encodeURIComponent(loadId) +
+            "&v=" +
+            Date.now(),
+            {
+              method: "GET"
+            }
+          );
+
+        const load = result || {};
+
+        showStatus(
+          "Carga encontrada.\n\n" +
+          "ID: " + (load.id_carga || "") + "\n" +
+          "Cliente: " + (load.cliente || "") + "\n" +
+          "NF: " + (load.nf || "") + "\n" +
+          "Status: " + (load.status || "") + "\n" +
+          "Documento: " +
+          (
+            load.possui_documento
+              ? (load.documento_nome || "Sim")
+              : "Não"
+          ),
+          "success"
+        );
+
+      } catch (error) {
+        showStatus(
+          "ERRO AO CONSULTAR CARGA\n\n" +
+          error.message,
+          "error"
+        );
+
+      } finally {
+        setButtonsDisabled(false);
+      }
+    });
+
+
+    clearButton.addEventListener(
+      "click",
+      resetForm
+    );
+
+
+    loadAllLoads();
+  </script>
+
+</body>
+</html>
