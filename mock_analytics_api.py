@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 HOST = "127.0.0.1"
 PORT = 8000
-API_KEY = "DEMO-COLOPLAST-2026"
+API_KEY = "vd_140926"
 
 # Banco de cargas fictício: substitui o Analytics só para demonstração.
 CARGAS = {
