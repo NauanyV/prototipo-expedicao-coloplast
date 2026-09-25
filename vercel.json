@@ -1,16 +1,3 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/cargas",
-      "destination": "/api?rota=cargas"
-    },
-    {
-      "source": "/api/cargas/:id",
-      "destination": "/api?rota=carga&id=:id"
-    },
-    {
-      "source": "/api/documentos",
-      "destination": "/api?rota=documentos"
-    }
-  ]
+  "version": 2
 }
